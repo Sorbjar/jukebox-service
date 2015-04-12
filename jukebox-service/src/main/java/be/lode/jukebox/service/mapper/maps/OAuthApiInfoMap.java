@@ -1,4 +1,4 @@
-package be.lode.jukebox.service.mapper;
+package be.lode.jukebox.service.mapper.maps;
 
 import org.modelmapper.PropertyMap;
 
