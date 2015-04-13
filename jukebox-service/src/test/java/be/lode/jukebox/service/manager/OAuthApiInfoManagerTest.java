@@ -23,7 +23,8 @@ public class OAuthApiInfoManagerTest {
 	@Test
 	public void testGetOAuthApiInfo() {
 		OAuthApiInfoDTO o = mgr.getOAuthApiInfo("Facebook");
-		assertEquals("getApiKey Expecting TestName", "837671609637096", o.getApiKey());
+		assertEquals("getApiKey Expecting TestName", "837671609637096",
+				o.getApiKey());
 		assertEquals("getName Expecting Facebook", "Facebook", o.getName());
 	}
 

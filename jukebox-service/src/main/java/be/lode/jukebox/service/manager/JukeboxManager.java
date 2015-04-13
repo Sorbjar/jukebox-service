@@ -6,11 +6,11 @@ import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import be.lode.general.repository.Repository;
 import be.lode.jukebox.business.Account;
 import be.lode.jukebox.business.Jukebox;
 import be.lode.jukebox.business.repo.AccountRepository;
 import be.lode.jukebox.business.repo.JukeboxRepository;
-import be.lode.jukebox.business.repo.Repository;
 import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;

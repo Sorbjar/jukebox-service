@@ -4,13 +4,15 @@
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
 	<persistence-unit name="jukebox-business">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<class>be.lode.jukebox.business.Account</class>
+		<class>be.lode.jukebox.business.Jukebox</class>
 		<class>be.lode.jukebox.business.OAuthApiInfo</class>
 		<properties>
 			<property name="hibernate.archive.autodetection" value="class" />
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
 			<property name="hibernate.connection.url" value="jdbc:mysql://127.0.0.1:3306/jukebox" />
-			<property name="hibernate.connection.username" value="root" />
-			<property name="hibernate.connection.password" value="!LOxc*QWoa3c#T8IoyoH" />
+			<property name="hibernate.connection.username" value="DBAdmin" />
+			<property name="hibernate.connection.password" value="VJMb@0^clXqmJju20j*2" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />

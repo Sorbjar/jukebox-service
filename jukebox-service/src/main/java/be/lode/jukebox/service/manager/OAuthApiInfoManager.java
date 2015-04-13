@@ -3,9 +3,9 @@ package be.lode.jukebox.service.manager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import be.lode.general.repository.Repository;
 import be.lode.jukebox.business.OAuthApiInfo;
 import be.lode.jukebox.business.repo.OAuthApiInfoRepository;
-import be.lode.jukebox.business.repo.Repository;
 import be.lode.jukebox.service.dto.OAuthApiInfoDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 
@@ -22,11 +22,9 @@ public class OAuthApiInfoManager {
 	}
 
 	public OAuthApiInfoDTO getOAuthApiInfo(String name) {
-		for (OAuthApiInfo oaai : oAuthrepo.getList()) {
-			if (oaai.getName().equalsIgnoreCase(name))
-				return modelMapper.map(oaai, OAuthApiInfoDTO.class);
-		}
-		return null;
+		//name is primary key, so find works
+		OAuthApiInfo oa =  oAuthrepo.find(OAuthApiInfo.class, name);
+		return modelMapper.map(oa, OAuthApiInfoDTO.class);
 	}
 
 }
