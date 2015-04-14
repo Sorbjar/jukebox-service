@@ -7,8 +7,6 @@
 		<class>be.lode.jukebox.business.Account</class>
 		<class>be.lode.jukebox.business.Jukebox</class>
 		<class>be.lode.jukebox.business.OAuthApiInfo</class>
-		<class>be.lode.jukebox.business.Account</class>
-		<class>be.lode.jukebox.business.Jukebox</class>
 		<properties>
 			<property name="hibernate.archive.autodetection" value="class" />
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />

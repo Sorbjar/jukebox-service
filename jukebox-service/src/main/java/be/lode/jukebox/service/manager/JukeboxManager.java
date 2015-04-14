@@ -52,8 +52,14 @@ public class JukeboxManager {
 
 	// FIXME testing getJukeboxes
 	public List<JukeboxDTO> getJukeboxes(AccountDTO acc) {
-		// FIXME create getjukeboxes
-		return new ArrayList<JukeboxDTO>();
+		// TODO check speed, if required change to stored procedure
+		ArrayList<JukeboxDTO> retList = new ArrayList<JukeboxDTO>();
+		for (Jukebox jbItem : jukeboxRepo.getList()) {
+			if (jbItem.getAccountRoles().containsKey(
+					modelMapper.map(acc, Account.class)))
+				retList.add(modelMapper.map(jbItem, JukeboxDTO.class));
+		}
+		return retList;
 
 	}
 
