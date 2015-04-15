@@ -17,8 +17,8 @@ import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 import be.lode.oauth.OAuthButton.IOAuthUser;
 
 public class JukeboxManager {
-	private EntityManagerFactory emf;
 	private Repository<Account> accountRepo;
+	private EntityManagerFactory emf;
 	private Repository<Jukebox> jukeboxRepo;
 	private JukeboxModelMapper modelMapper;
 
@@ -28,6 +28,20 @@ public class JukeboxManager {
 		accountRepo = new AccountRepository(emf);
 		jukeboxRepo = new JukeboxRepository(emf);
 		modelMapper = new JukeboxModelMapper();
+	}
+
+	// FIXME testing getJukeboxes
+	public List<JukeboxDTO> getJukeboxes(AccountDTO acc) {
+		// TODO check speed, if required change to stored procedure
+		ArrayList<JukeboxDTO> retList = new ArrayList<JukeboxDTO>();
+		if (acc != null) {
+			for (Jukebox jbItem : jukeboxRepo.getList()) {
+				if (jbItem.getAccountRoles().containsKey(
+						modelMapper.map(acc, Account.class)))
+					retList.add(modelMapper.map(jbItem, JukeboxDTO.class));
+			}
+		}
+		return retList;
 	}
 
 	public AccountDTO getUser(IOAuthUser user) {
@@ -41,26 +55,11 @@ public class JukeboxManager {
 		o.setServiceName(user.getService());
 
 		Account acc = modelMapper.map(o, Account.class);
-
 		for (Account accItem : accountRepo.getList()) {
 			if (accItem.equals(acc))
 				return modelMapper.map(accItem, AccountDTO.class);
 		}
-		accountRepo.save(acc);
-		return o;
-	}
-
-	// FIXME testing getJukeboxes
-	public List<JukeboxDTO> getJukeboxes(AccountDTO acc) {
-		// TODO check speed, if required change to stored procedure
-		ArrayList<JukeboxDTO> retList = new ArrayList<JukeboxDTO>();
-		for (Jukebox jbItem : jukeboxRepo.getList()) {
-			if (jbItem.getAccountRoles().containsKey(
-					modelMapper.map(acc, Account.class)))
-				retList.add(modelMapper.map(jbItem, JukeboxDTO.class));
-		}
-		return retList;
-
+		return modelMapper.map(accountRepo.save(acc), AccountDTO.class);
 	}
 
 }
