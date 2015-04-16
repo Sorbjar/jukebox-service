@@ -33,12 +33,10 @@ public class JukeboxManager extends Observable {
 		modelMapper = new JukeboxModelMapper();
 	}
 
-	// FIXME testing
 	public AccountDTO getAccount(AccountDTO loggedInAccount) {
 		return findAccountFromList(loggedInAccount);
 	}
 
-	// FIXME testing getJukeboxes
 	public List<JukeboxDTO> getJukeboxes(AccountDTO acc) {
 		// TODO check speed, if required change to stored procedure
 		ArrayList<JukeboxDTO> retList = new ArrayList<JukeboxDTO>();
@@ -65,7 +63,6 @@ public class JukeboxManager extends Observable {
 		return findAccountFromList(o);
 	}
 
-	// FIXME testing
 	public boolean isValidEmailAddress(String email) {
 		boolean result = true;
 		try {
@@ -77,7 +74,6 @@ public class JukeboxManager extends Observable {
 		return result;
 	}
 
-	// FIXME testing
 	public AccountDTO save(AccountDTO dto) {
 		Account acc = accountRepo.save(modelMapper.map(dto, Account.class));
 		return modelMapper.map(acc, AccountDTO.class);

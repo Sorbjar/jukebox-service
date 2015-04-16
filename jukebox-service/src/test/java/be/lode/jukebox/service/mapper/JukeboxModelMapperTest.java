@@ -39,26 +39,6 @@ public class JukeboxModelMapperTest {
 	}
 
 	@Test
-	public void mapOAuthApiInfoToObj() {
-		// no test, since no setters are defined for object
-	}
-
-	@Test
-	public void testJukeboxModelMapper() {
-		// no test, constructor adds maps, these are tested in actual mappings
-	}
-
-	@Test
-	public void mapOAuthUserToAccountDTO() {
-		// can't be tested, since it's get built by facebook service
-	}
-
-	@Test
-	public void mapAccountDTOToOAuthUser() {
-		// no test, since no setters are defined for object
-	}
-
-	@Test
 	public void mapAccountToDTO() {
 
 		Account o = new Account("email", "firstname", "lastName", "serviceId",
@@ -83,7 +63,6 @@ public class JukeboxModelMapperTest {
 		oDTO.setLastName("lastName");
 		oDTO.setServiceId("serviceId");
 		oDTO.setServiceName("serviceName");
-
 		oDTO.setId("10");
 
 		Account o = modelMapper.map(oDTO, Account.class);
