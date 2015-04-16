@@ -2,7 +2,10 @@ package be.lode.jukebox.service.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -16,7 +19,7 @@ import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 import be.lode.oauth.OAuthButton.IOAuthUser;
 
-public class JukeboxManager {
+public class JukeboxManager extends Observable {
 	private Repository<Account> accountRepo;
 	private EntityManagerFactory emf;
 	private Repository<Jukebox> jukeboxRepo;
@@ -28,6 +31,11 @@ public class JukeboxManager {
 		accountRepo = new AccountRepository(emf);
 		jukeboxRepo = new JukeboxRepository(emf);
 		modelMapper = new JukeboxModelMapper();
+	}
+
+	// FIXME testing
+	public AccountDTO getAccount(AccountDTO loggedInAccount) {
+		return findAccountFromList(loggedInAccount);
 	}
 
 	// FIXME testing getJukeboxes
@@ -54,6 +62,29 @@ public class JukeboxManager {
 		o.setServiceId(user.getId());
 		o.setServiceName(user.getService());
 
+		return findAccountFromList(o);
+	}
+
+	// FIXME testing
+	public boolean isValidEmailAddress(String email) {
+		boolean result = true;
+		try {
+			InternetAddress emailAddr = new InternetAddress(email);
+			emailAddr.validate();
+		} catch (AddressException ex) {
+			result = false;
+		}
+		return result;
+	}
+
+	// FIXME testing
+	public AccountDTO save(AccountDTO dto) {
+		Account acc = accountRepo.save(modelMapper.map(dto, Account.class));
+		return modelMapper.map(acc, AccountDTO.class);
+	}
+
+	// TODO test speed, if needed change method
+	private AccountDTO findAccountFromList(AccountDTO o) {
 		Account acc = modelMapper.map(o, Account.class);
 		for (Account accItem : accountRepo.getList()) {
 			if (accItem.equals(acc))

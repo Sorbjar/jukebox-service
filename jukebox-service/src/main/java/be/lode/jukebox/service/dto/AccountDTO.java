@@ -3,6 +3,7 @@ package be.lode.jukebox.service.dto;
 public class AccountDTO {
 	private String emailAddress;
 	private String firstName;
+	private String id;
 	private String lastName;
 	private String serviceId;
 	private String serviceName;
@@ -13,6 +14,10 @@ public class AccountDTO {
 
 	public String getFirstName() {
 		return firstName;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public String getLastName() {
@@ -33,6 +38,10 @@ public class AccountDTO {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public void setLastName(String lastName) {

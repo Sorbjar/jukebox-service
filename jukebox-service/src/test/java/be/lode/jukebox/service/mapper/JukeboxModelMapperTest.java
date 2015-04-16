@@ -63,9 +63,11 @@ public class JukeboxModelMapperTest {
 
 		Account o = new Account("email", "firstname", "lastName", "serviceId",
 				"serviceName");
+		o.setId(10);
 
 		AccountDTO oDTO = modelMapper.map(o, AccountDTO.class);
-		
+
+		assertEquals(String.valueOf(o.getId()), oDTO.getId());
 		assertEquals(o.getEmailAddress(), oDTO.getEmailAddress());
 		assertEquals(o.getFirstName(), oDTO.getFirstName());
 		assertEquals(o.getLastName(), oDTO.getLastName());
@@ -82,8 +84,11 @@ public class JukeboxModelMapperTest {
 		oDTO.setServiceId("serviceId");
 		oDTO.setServiceName("serviceName");
 
+		oDTO.setId("10");
+
 		Account o = modelMapper.map(oDTO, Account.class);
-		
+
+		assertEquals(Long.valueOf(oDTO.getId()).longValue(), o.getId());
 		assertEquals(oDTO.getEmailAddress(), o.getEmailAddress());
 		assertEquals(oDTO.getFirstName(), o.getFirstName());
 		assertEquals(oDTO.getLastName(), o.getLastName());
