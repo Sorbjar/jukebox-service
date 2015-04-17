@@ -6,8 +6,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import be.lode.jukebox.business.Account;
+import be.lode.jukebox.business.Jukebox;
 import be.lode.jukebox.business.OAuthApiInfo;
 import be.lode.jukebox.service.dto.AccountDTO;
+import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.OAuthApiInfoDTO;
 
 public class JukeboxModelMapperTest {
@@ -54,7 +56,7 @@ public class JukeboxModelMapperTest {
 		assertEquals(o.getServiceId(), oDTO.getServiceId());
 		assertEquals(o.getServiceName(), oDTO.getServiceName());
 	}
-	
+
 	@Test
 	public void mapAccountDTOToObj() {
 		AccountDTO oDTO = new AccountDTO();
@@ -73,5 +75,32 @@ public class JukeboxModelMapperTest {
 		assertEquals(oDTO.getLastName(), o.getLastName());
 		assertEquals(oDTO.getServiceId(), o.getServiceId());
 		assertEquals(oDTO.getServiceName(), o.getServiceName());
+	}
+
+	@Test
+	public void mapJukeboxToDTO() {
+
+		Account acc = new Account("email", "firstname", "lastName",
+				"serviceId", "serviceName");
+		acc.setId(10);
+		Jukebox o = new Jukebox("new name", acc);
+		o.setId(20);
+
+		JukeboxDTO oDTO = modelMapper.map(o, JukeboxDTO.class);
+
+		assertEquals(String.valueOf(o.getId()), oDTO.getId());
+		assertEquals(o.getName(), oDTO.getName());
+	}
+
+	@Test
+	public void mapJukeboxDTOToObj() {
+		JukeboxDTO oDTO = new JukeboxDTO();
+		oDTO.setId("25");
+		oDTO.setName("aaa");
+
+		Jukebox o = modelMapper.map(oDTO, Jukebox.class);
+
+		assertEquals(Long.valueOf(oDTO.getId()).longValue(), o.getId());
+		assertEquals(oDTO.getName(), o.getName());
 	}
 }

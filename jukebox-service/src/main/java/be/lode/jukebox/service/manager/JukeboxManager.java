@@ -14,6 +14,7 @@ import be.lode.jukebox.business.Account;
 import be.lode.jukebox.business.Jukebox;
 import be.lode.jukebox.business.repo.AccountRepository;
 import be.lode.jukebox.business.repo.JukeboxRepository;
+import be.lode.jukebox.service.UpdateArgs;
 import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
@@ -21,6 +22,7 @@ import be.lode.oauth.OAuthButton.IOAuthUser;
 
 public class JukeboxManager extends Observable {
 	private Repository<Account> accountRepo;
+	private Jukebox currentJukebox;
 	private EntityManagerFactory emf;
 	private Repository<Jukebox> jukeboxRepo;
 	private JukeboxModelMapper modelMapper;
@@ -33,8 +35,29 @@ public class JukeboxManager extends Observable {
 		modelMapper = new JukeboxModelMapper();
 	}
 
+	public void createNewJukebox(AccountDTO oDTO) {
+		Account acc = modelMapper.map(oDTO, Account.class);
+		Jukebox jb = new Jukebox(acc);
+		jb = jukeboxRepo.save(jb);
+		currentJukebox = jb;
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
+
+	}
+
+	public void deleteJukebox(JukeboxDTO jbDto) {
+		Jukebox jb = modelMapper.map(jbDto, Jukebox.class);
+		jukeboxRepo.delete(jb);
+		setChanged();
+		notifyObservers(UpdateArgs.JUKEBOXLIST);
+	}
+
 	public AccountDTO getAccount(AccountDTO loggedInAccount) {
 		return findAccountFromList(loggedInAccount);
+	}
+
+	public Jukebox getCurrentJukebox() {
+		return currentJukebox;
 	}
 
 	public List<JukeboxDTO> getJukeboxes(AccountDTO acc) {
@@ -77,6 +100,15 @@ public class JukeboxManager extends Observable {
 	public AccountDTO save(AccountDTO dto) {
 		Account acc = accountRepo.save(modelMapper.map(dto, Account.class));
 		return modelMapper.map(acc, AccountDTO.class);
+	}
+
+	public void setCurrentJukebox(JukeboxDTO selectedJukebox) {
+		Jukebox jb = modelMapper.map(selectedJukebox, Jukebox.class);
+		jb = jukeboxRepo.save(jb);
+		this.currentJukebox = jb;
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
+
 	}
 
 	// TODO test speed, if needed change method

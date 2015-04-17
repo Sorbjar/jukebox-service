@@ -3,6 +3,7 @@ package be.lode.jukebox.service.manager;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -11,17 +12,51 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
+import be.lode.jukebox.business.Account;
+import be.lode.jukebox.business.Jukebox;
+import be.lode.jukebox.business.enums.Role;
 import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
+import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 import be.lode.setup.ClearThenSetupDBData;
 
 public class JukeboxManagerTest {
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		ClearThenSetupDBData.run();
+	}
+
 	private JukeboxManager mgr;
+	private JukeboxModelMapper mapper;
 
 	@Before
 	public void setUp() throws Exception {
 		ClearThenSetupDBData.run();
 		mgr = new JukeboxManager();
+		mapper = new JukeboxModelMapper();
+	}
+
+	@Test
+	public void testCreateNewJukebox() {
+		AccountDTO oDTO = new AccountDTO();
+		oDTO.setEmailAddress("newaddress");
+		oDTO.setFirstName("newFirstname");
+		oDTO.setLastName("newLast");
+		oDTO.setServiceId("1015329426926456");
+		oDTO.setServiceName("facebook");
+		oDTO = mgr.save(oDTO);
+		mgr.createNewJukebox(oDTO);
+
+		assertNotNull("createJukebox - current jukebox not null",
+				mgr.getCurrentJukebox());
+		assertEquals(1, mgr.getCurrentJukebox().getAccountRoles().size());
+		JukeboxModelMapper mapper = new JukeboxModelMapper();
+		Account acc = mapper.map(oDTO, Account.class);
+		assertTrue("new jukebox contains account", mgr.getCurrentJukebox()
+				.getAccountRoles().containsKey(acc));
+		assertEquals(Role.Administrator, mgr.getCurrentJukebox()
+				.getAccountRoles().get(acc));
+
 	}
 
 	@Test
@@ -114,9 +149,23 @@ public class JukeboxManagerTest {
 		assertEquals(oDTO.getServiceName(), saved.getServiceName());
 	}
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		ClearThenSetupDBData.run();
+	@Test
+	public void testSetCurrentJukeboxJukeboxDTO() {
+		AccountDTO oDTO = new AccountDTO();
+		oDTO.setEmailAddress("newaddress");
+		oDTO.setFirstName("newFirstname");
+		oDTO.setLastName("newLast");
+		oDTO.setServiceId("10153294269263586");
+		oDTO.setServiceName("facebook");
+		oDTO.setId("1");
+		assertNull(mgr.getCurrentJukebox());
+		AccountDTO getO = mgr.getAccount(oDTO);
+		for (JukeboxDTO jb : mgr.getJukeboxes(getO)) {
+			mgr.setCurrentJukebox(jb);
+			assertNotNull(mgr.getCurrentJukebox());
+			assertEquals(mapper.map(jb, Jukebox.class), mgr.getCurrentJukebox());
+		}
+
 	}
 
 }
