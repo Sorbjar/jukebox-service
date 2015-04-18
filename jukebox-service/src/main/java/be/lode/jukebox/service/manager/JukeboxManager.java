@@ -61,7 +61,7 @@ public class JukeboxManager extends Observable {
 	}
 
 	public List<JukeboxDTO> getJukeboxes(AccountDTO acc) {
-		// TODO check speed, if required change to stored procedure
+		// TODO 900 check speed, if required change to stored procedure
 		ArrayList<JukeboxDTO> retList = new ArrayList<JukeboxDTO>();
 		if (acc != null) {
 			for (Jukebox jbItem : jukeboxRepo.getList()) {
@@ -74,7 +74,7 @@ public class JukeboxManager extends Observable {
 	}
 
 	public AccountDTO getUser(IOAuthUser user) {
-		// TODO issue with modelmapper
+		// TODO 860 issue with modelmapper
 		// o = modelMapper.map( user, AccountDTO.class);
 		AccountDTO o = new AccountDTO();
 		o.setEmailAddress(user.getEmail());
@@ -111,7 +111,7 @@ public class JukeboxManager extends Observable {
 
 	}
 
-	// TODO test speed, if needed change method
+	// TODO 900 test speed, if needed change method
 	private AccountDTO findAccountFromList(AccountDTO o) {
 		Account acc = modelMapper.map(o, Account.class);
 		for (Account accItem : accountRepo.getList()) {
