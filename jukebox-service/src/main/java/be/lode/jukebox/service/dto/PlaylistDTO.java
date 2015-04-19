@@ -1,10 +1,10 @@
 package be.lode.jukebox.service.dto;
 
-public class JukeboxDTO {
+public class PlaylistDTO {
 	private String id;
 	private String name;
-	
-	public JukeboxDTO() {
+
+	public PlaylistDTO() {
 		super();
 		this.id = "";
 		this.name = "";
@@ -18,7 +18,7 @@ public class JukeboxDTO {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		JukeboxDTO other = (JukeboxDTO) obj;
+		PlaylistDTO other = (PlaylistDTO) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

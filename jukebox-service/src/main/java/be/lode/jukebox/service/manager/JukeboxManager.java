@@ -10,13 +10,15 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import be.lode.general.repository.Repository;
-import be.lode.jukebox.business.Account;
-import be.lode.jukebox.business.Jukebox;
+import be.lode.jukebox.business.model.Account;
+import be.lode.jukebox.business.model.Jukebox;
+import be.lode.jukebox.business.model.Playlist;
 import be.lode.jukebox.business.repo.AccountRepository;
 import be.lode.jukebox.business.repo.JukeboxRepository;
 import be.lode.jukebox.service.UpdateArgs;
 import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
+import be.lode.jukebox.service.dto.PlaylistDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 import be.lode.oauth.OAuthButton.IOAuthUser;
 
@@ -24,6 +26,11 @@ public class JukeboxManager extends Observable {
 	private Repository<Account> accountRepo;
 	private Jukebox currentJukebox;
 	private EntityManagerFactory emf;
+
+	public EntityManagerFactory getEmf() {
+		return emf;
+	}
+
 	private Repository<Jukebox> jukeboxRepo;
 	private JukeboxModelMapper modelMapper;
 
@@ -42,7 +49,6 @@ public class JukeboxManager extends Observable {
 		currentJukebox = jb;
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
-
 	}
 
 	public void deleteJukebox(JukeboxDTO jbDto) {
@@ -56,8 +62,10 @@ public class JukeboxManager extends Observable {
 		return findAccountFromList(loggedInAccount);
 	}
 
-	public Jukebox getCurrentJukebox() {
-		return currentJukebox;
+	public JukeboxDTO getCurrentJukebox() {
+		if (currentJukebox != null)
+			return modelMapper.map(currentJukebox, JukeboxDTO.class);
+		return null;
 	}
 
 	public List<JukeboxDTO> getJukeboxes(AccountDTO acc) {
@@ -71,6 +79,16 @@ public class JukeboxManager extends Observable {
 			}
 		}
 		return retList;
+	}
+
+	public List<PlaylistDTO> getSavedPlaylists(JukeboxDTO jukeboxDTO) {
+		Jukebox jb = modelMapper.map(jukeboxDTO, Jukebox.class);
+		jb = jukeboxRepo.find(jb);
+		List<PlaylistDTO> ret = new ArrayList<PlaylistDTO>();
+		for (Playlist pl : jb.getSavedPlaylists()) {
+			ret.add(modelMapper.map(pl, PlaylistDTO.class));
+		}
+		return ret;
 	}
 
 	public AccountDTO getUser(IOAuthUser user) {

@@ -10,24 +10,34 @@ import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import be.lode.jukebox.business.Account;
-import be.lode.jukebox.business.Jukebox;
-import be.lode.jukebox.business.enums.Role;
+import be.lode.general.repository.Repository;
+import be.lode.jukebox.business.model.Account;
+import be.lode.jukebox.business.model.Jukebox;
+import be.lode.jukebox.business.model.Playlist;
+import be.lode.jukebox.business.model.enums.Role;
+import be.lode.jukebox.business.repo.JukeboxRepository;
+import be.lode.jukebox.business.repo.PlaylistRepository;
 import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 import be.lode.setup.ClearThenSetupDBData;
 
 public class JukeboxManagerTest {
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		ClearThenSetupDBData.run();
+	}
+
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		ClearThenSetupDBData.run();
 	}
 
-	private JukeboxManager mgr;
 	private JukeboxModelMapper mapper;
+	private JukeboxManager mgr;
 
 	@Before
 	public void setUp() throws Exception {
@@ -46,16 +56,16 @@ public class JukeboxManagerTest {
 		oDTO.setServiceName("facebook");
 		oDTO = mgr.save(oDTO);
 		mgr.createNewJukebox(oDTO);
-
-		assertNotNull("createJukebox - current jukebox not null",
-				mgr.getCurrentJukebox());
-		assertEquals(1, mgr.getCurrentJukebox().getAccountRoles().size());
 		JukeboxModelMapper mapper = new JukeboxModelMapper();
+		Jukebox current = mapper.map(mgr.getCurrentJukebox(), Jukebox.class);
+		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
+		current = jRepo.find(current);
+		assertNotNull("createJukebox - current jukebox not null", current);
+		assertEquals(1, current.getAccountRoles().size());
 		Account acc = mapper.map(oDTO, Account.class);
-		assertTrue("new jukebox contains account", mgr.getCurrentJukebox()
-				.getAccountRoles().containsKey(acc));
-		assertEquals(Role.Administrator, mgr.getCurrentJukebox()
-				.getAccountRoles().get(acc));
+		assertTrue("new jukebox contains account", current.getAccountRoles()
+				.containsKey(acc));
+		assertEquals(Role.Administrator, current.getAccountRoles().get(acc));
 
 	}
 
@@ -163,9 +173,26 @@ public class JukeboxManagerTest {
 		for (JukeboxDTO jb : mgr.getJukeboxes(getO)) {
 			mgr.setCurrentJukebox(jb);
 			assertNotNull(mgr.getCurrentJukebox());
-			assertEquals(mapper.map(jb, Jukebox.class), mgr.getCurrentJukebox());
+			assertEquals(jb, mgr.getCurrentJukebox());
 		}
 
 	}
 
+	@Test
+	public void testGetSavedPlaylists() {
+		Jukebox jb = new Jukebox();
+		for (int i = 0; i < 5; i++) {
+			Playlist pl = new Playlist("test" + Integer.toString(i));
+			Repository<Playlist> pRepo = new PlaylistRepository(mgr.getEmf());
+			pl = pRepo.save(pl);
+			jb.getSavedPlaylists().add(pl);
+		}
+		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
+		jb = jRepo.save(jb);
+
+		JukeboxDTO jbDTO = mapper.map(jb, JukeboxDTO.class);
+		assertNotNull(mgr.getSavedPlaylists(jbDTO));
+
+		assertEquals(5, mgr.getSavedPlaylists(jbDTO).size());
+	}
 }

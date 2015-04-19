@@ -4,9 +4,11 @@
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
 	<persistence-unit name="jukebox-business">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>be.lode.jukebox.business.Account</class>
-		<class>be.lode.jukebox.business.Jukebox</class>
-		<class>be.lode.jukebox.business.OAuthApiInfo</class>
+		<class>be.lode.jukebox.business.model.Account</class>
+		<class>be.lode.jukebox.business.model.Jukebox</class>
+		<class>be.lode.jukebox.business.model.OAuthApiInfo</class>
+		<class>be.lode.jukebox.business.model.Song</class>
+		<class>be.lode.jukebox.business.model.Playlist</class>
 		<properties>
 			<property name="hibernate.archive.autodetection" value="class" />
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
