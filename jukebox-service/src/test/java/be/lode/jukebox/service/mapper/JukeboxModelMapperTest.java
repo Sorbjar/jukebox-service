@@ -15,17 +15,17 @@ import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.OAuthApiInfoDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
-import be.lode.setup.ClearThenSetupDBData;
+import be.lode.setup.ClearThenSetupTestDBData;
 
 public class JukeboxModelMapperTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		ClearThenSetupDBData.run();
+		ClearThenSetupTestDBData.run();
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		ClearThenSetupDBData.run();
+		ClearThenSetupTestDBData.run();
 	}
 
 	private JukeboxModelMapper modelMapper;

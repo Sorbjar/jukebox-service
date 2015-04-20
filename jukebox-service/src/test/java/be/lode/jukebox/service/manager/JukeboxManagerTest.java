@@ -23,17 +23,17 @@ import be.lode.jukebox.business.repo.PlaylistRepository;
 import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
-import be.lode.setup.ClearThenSetupDBData;
+import be.lode.setup.ClearThenSetupTestDBData;
 
 public class JukeboxManagerTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		ClearThenSetupDBData.run();
+		ClearThenSetupTestDBData.run();
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		ClearThenSetupDBData.run();
+		ClearThenSetupTestDBData.run();
 	}
 
 	private JukeboxModelMapper mapper;
@@ -41,7 +41,7 @@ public class JukeboxManagerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ClearThenSetupDBData.run();
+		ClearThenSetupTestDBData.run();
 		mgr = new JukeboxManager();
 		mapper = new JukeboxModelMapper();
 	}
@@ -57,7 +57,7 @@ public class JukeboxManagerTest {
 		oDTO = mgr.save(oDTO);
 		mgr.createNewJukebox(oDTO);
 		JukeboxModelMapper mapper = new JukeboxModelMapper();
-		Jukebox current = mapper.map(mgr.getCurrentJukebox(), Jukebox.class);
+		Jukebox current = mapper.map(mgr.getCurrentJukeboxDTO(), Jukebox.class);
 		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
 		current = jRepo.find(current);
 		assertNotNull("createJukebox - current jukebox not null", current);
@@ -168,12 +168,12 @@ public class JukeboxManagerTest {
 		oDTO.setServiceId("10153294269263586");
 		oDTO.setServiceName("facebook");
 		oDTO.setId("1");
-		assertNull(mgr.getCurrentJukebox());
+		assertNull(mgr.getCurrentJukeboxDTO());
 		AccountDTO getO = mgr.getAccount(oDTO);
 		for (JukeboxDTO jb : mgr.getJukeboxes(getO)) {
 			mgr.setCurrentJukebox(jb);
-			assertNotNull(mgr.getCurrentJukebox());
-			assertEquals(jb, mgr.getCurrentJukebox());
+			assertNotNull(mgr.getCurrentJukeboxDTO());
+			assertEquals(jb, mgr.getCurrentJukeboxDTO());
 		}
 
 	}

@@ -15,6 +15,7 @@ import be.lode.jukebox.business.model.Jukebox;
 import be.lode.jukebox.business.model.Playlist;
 import be.lode.jukebox.business.repo.AccountRepository;
 import be.lode.jukebox.business.repo.JukeboxRepository;
+import be.lode.jukebox.business.repo.PlaylistRepository;
 import be.lode.jukebox.service.UpdateArgs;
 import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
@@ -25,20 +26,19 @@ import be.lode.oauth.OAuthButton.IOAuthUser;
 public class JukeboxManager extends Observable {
 	private Repository<Account> accountRepo;
 	private Jukebox currentJukebox;
-	private EntityManagerFactory emf;
+	private Playlist currentPlaylist;
 
-	public EntityManagerFactory getEmf() {
-		return emf;
-	}
+	private EntityManagerFactory emf;
 
 	private Repository<Jukebox> jukeboxRepo;
 	private JukeboxModelMapper modelMapper;
-
+	private PlaylistRepository playlistRepo;
 	public JukeboxManager() {
 		super();
 		emf = Persistence.createEntityManagerFactory("jukebox-business");
 		accountRepo = new AccountRepository(emf);
 		jukeboxRepo = new JukeboxRepository(emf);
+		playlistRepo = new PlaylistRepository(emf);
 		modelMapper = new JukeboxModelMapper();
 	}
 
@@ -62,10 +62,20 @@ public class JukeboxManager extends Observable {
 		return findAccountFromList(loggedInAccount);
 	}
 
-	public JukeboxDTO getCurrentJukebox() {
+	public JukeboxDTO getCurrentJukeboxDTO() {
 		if (currentJukebox != null)
 			return modelMapper.map(currentJukebox, JukeboxDTO.class);
 		return null;
+	}
+
+	public PlaylistDTO getCurrentPlaylistDTO() {
+		if (currentPlaylist != null)
+			return modelMapper.map(currentPlaylist, PlaylistDTO.class);
+		return null;
+	}
+
+	public EntityManagerFactory getEmf() {
+		return emf;
 	}
 
 	public List<JukeboxDTO> getJukeboxes(AccountDTO acc) {
@@ -122,10 +132,23 @@ public class JukeboxManager extends Observable {
 
 	public void setCurrentJukebox(JukeboxDTO selectedJukebox) {
 		Jukebox jb = modelMapper.map(selectedJukebox, Jukebox.class);
-		jb = jukeboxRepo.save(jb);
+		if (jukeboxRepo.find(jb) == null)
+			jb = jukeboxRepo.save(jb);
+		jb = jukeboxRepo.find(jb);
 		this.currentJukebox = jb;
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
+
+	}
+
+	public void setCurrentPlaylist(PlaylistDTO playlistDTO) {
+		Playlist pl = modelMapper.map(playlistDTO, Playlist.class);
+		if (playlistRepo.find(pl) == null)
+			pl = playlistRepo.save(pl);
+		pl = playlistRepo.find(pl);
+		this.currentPlaylist = pl;
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 
 	}
 
