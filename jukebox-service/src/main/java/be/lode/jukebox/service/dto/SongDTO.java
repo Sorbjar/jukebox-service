@@ -5,12 +5,14 @@ public class SongDTO {
 	private String artist;
 	private String id;
 	private String path;
+	private String playListOrder;
 	private String title;
 
 	public SongDTO() {
 		super();
 		this.artist = "";
 		this.title = "";
+		this.playListOrder = "";
 	}
 
 	@Override
@@ -26,6 +28,11 @@ public class SongDTO {
 			if (other.artist != null)
 				return false;
 		} else if (!artist.equals(other.artist))
+			return false;
+		if (playListOrder == null) {
+			if (other.playListOrder != null)
+				return false;
+		} else if (!playListOrder.equals(other.playListOrder))
 			return false;
 		if (title == null) {
 			if (other.title != null)
@@ -47,6 +54,10 @@ public class SongDTO {
 		return path;
 	}
 
+	public String getPlayListOrder() {
+		return playListOrder;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -56,6 +67,8 @@ public class SongDTO {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((artist == null) ? 0 : artist.hashCode());
+		result = prime * result
+				+ ((playListOrder == null) ? 0 : playListOrder.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
@@ -70,6 +83,10 @@ public class SongDTO {
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public void setPlayListOrder(String playListOrder) {
+		this.playListOrder = playListOrder;
 	}
 
 	public void setTitle(String title) {

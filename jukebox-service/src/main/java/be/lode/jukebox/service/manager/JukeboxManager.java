@@ -122,7 +122,9 @@ public class JukeboxManager extends Observable {
 			pl = playlistRepo.find(pl);
 			for (Map.Entry<Integer, Song> entry : pl.getSongs().entrySet()) {
 				Song value = entry.getValue();
-				ret.add(modelMapper.map(value, SongDTO.class));
+				SongDTO dto = modelMapper.map(value, SongDTO.class);
+				dto.setPlayListOrder(entry.getKey().toString());
+				ret.add(dto);
 			}
 		}
 		return ret;
@@ -187,6 +189,25 @@ public class JukeboxManager extends Observable {
 				return modelMapper.map(accItem, AccountDTO.class);
 		}
 		return modelMapper.map(accountRepo.save(acc), AccountDTO.class);
+	}
+
+	public void reorderPlaylist(SongDTO source, SongDTO target) {
+		currentPlaylist = playlistRepo.find(currentPlaylist);
+		currentPlaylist.moveSong(Integer.parseInt(source.getPlayListOrder()),
+				Integer.parseInt(target.getPlayListOrder()));
+		currentPlaylist = playlistRepo.save(currentPlaylist);
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
+	}
+
+	public void addSong(SongDTO sourceItemId, SongDTO targetItemId) {
+		currentPlaylist = playlistRepo.find(currentPlaylist);
+		Song source = modelMapper.map(sourceItemId, Song.class);
+		currentPlaylist.addSong(source);
+		currentPlaylist.moveSong(currentPlaylist.getSongs().lastKey(), Integer.parseInt(targetItemId.getPlayListOrder()));
+		currentPlaylist = playlistRepo.save(currentPlaylist);
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 	}
 
 }
