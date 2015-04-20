@@ -11,10 +11,12 @@ import be.lode.jukebox.business.model.Account;
 import be.lode.jukebox.business.model.Jukebox;
 import be.lode.jukebox.business.model.OAuthApiInfo;
 import be.lode.jukebox.business.model.Playlist;
+import be.lode.jukebox.business.model.Song;
 import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.OAuthApiInfoDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
+import be.lode.jukebox.service.dto.SongDTO;
 import be.lode.setup.ClearThenSetupTestDBData;
 
 public class JukeboxModelMapperTest {
@@ -132,6 +134,33 @@ public class JukeboxModelMapperTest {
 		Playlist o = modelMapper.map(oDTO, Playlist.class);
 		assertEquals(oDTO.getId(), String.valueOf(o.getId()));
 		assertEquals(oDTO.getName(), o.getName());
+	}
+	
+	@Test
+	public void mapSongToDTO() {
+		Song o = new Song("artistmapSongToDTO", "titlemapSongToDTO", "pathmapSongToDTO");
+		o.setId(17);
+
+		SongDTO oDTO = modelMapper.map(o, SongDTO.class);
+		assertEquals(String.valueOf(o.getId()), oDTO.getId());
+		assertEquals(o.getArtist(), oDTO.getArtist());
+		assertEquals(o.getTitle(), oDTO.getTitle());
+		assertEquals(o.getPath(), oDTO.getPath());
+	}
+
+	@Test
+	public void mapSongDTOToObj() {
+		SongDTO oDTO = new SongDTO();
+		oDTO.setId("17");
+		oDTO.setArtist("mapSongDTOToObjArtist");
+		oDTO.setTitle("mapSongDTOToObjTitle");
+		oDTO.setPath("mapSongDTOToObjPath");
+
+		Song o = modelMapper.map(oDTO, Song.class);
+		assertEquals(oDTO.getId(), String.valueOf(o.getId()));
+		assertEquals(oDTO.getArtist(), o.getArtist());
+		assertEquals(oDTO.getTitle(), o.getTitle());
+		assertEquals(oDTO.getPath(), o.getPath());
 	}
 
 	@Before

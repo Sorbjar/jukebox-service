@@ -2,6 +2,7 @@ package be.lode.jukebox.service.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
 import javax.mail.internet.AddressException;
@@ -13,13 +14,16 @@ import be.lode.general.repository.Repository;
 import be.lode.jukebox.business.model.Account;
 import be.lode.jukebox.business.model.Jukebox;
 import be.lode.jukebox.business.model.Playlist;
+import be.lode.jukebox.business.model.Song;
 import be.lode.jukebox.business.repo.AccountRepository;
 import be.lode.jukebox.business.repo.JukeboxRepository;
 import be.lode.jukebox.business.repo.PlaylistRepository;
+import be.lode.jukebox.business.repo.SongRepository;
 import be.lode.jukebox.service.UpdateArgs;
 import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
+import be.lode.jukebox.service.dto.SongDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 import be.lode.oauth.OAuthButton.IOAuthUser;
 
@@ -27,18 +31,19 @@ public class JukeboxManager extends Observable {
 	private Repository<Account> accountRepo;
 	private Jukebox currentJukebox;
 	private Playlist currentPlaylist;
-
 	private EntityManagerFactory emf;
-
 	private Repository<Jukebox> jukeboxRepo;
 	private JukeboxModelMapper modelMapper;
-	private PlaylistRepository playlistRepo;
+	private Repository<Playlist> playlistRepo;
+	private Repository<Song> songRepo;
+
 	public JukeboxManager() {
 		super();
 		emf = Persistence.createEntityManagerFactory("jukebox-business");
 		accountRepo = new AccountRepository(emf);
 		jukeboxRepo = new JukeboxRepository(emf);
 		playlistRepo = new PlaylistRepository(emf);
+		songRepo = new SongRepository(emf);
 		modelMapper = new JukeboxModelMapper();
 	}
 
@@ -60,6 +65,14 @@ public class JukeboxManager extends Observable {
 
 	public AccountDTO getAccount(AccountDTO loggedInAccount) {
 		return findAccountFromList(loggedInAccount);
+	}
+
+	public List<SongDTO> getAllSongs() {
+		List<SongDTO> ret = new ArrayList<SongDTO>();
+		for (Song s : songRepo.getList()) {
+			ret.add(modelMapper.map(s, SongDTO.class));
+		}
+		return ret;
 	}
 
 	public JukeboxDTO getCurrentJukeboxDTO() {
@@ -97,6 +110,20 @@ public class JukeboxManager extends Observable {
 		List<PlaylistDTO> ret = new ArrayList<PlaylistDTO>();
 		for (Playlist pl : jb.getSavedPlaylists()) {
 			ret.add(modelMapper.map(pl, PlaylistDTO.class));
+		}
+		return ret;
+	}
+
+	public List<SongDTO> getSongs(PlaylistDTO playlistDTO) {
+
+		List<SongDTO> ret = new ArrayList<SongDTO>();
+		if (playlistDTO != null) {
+			Playlist pl = modelMapper.map(playlistDTO, Playlist.class);
+			pl = playlistRepo.find(pl);
+			for (Map.Entry<Integer, Song> entry : pl.getSongs().entrySet()) {
+				Song value = entry.getValue();
+				ret.add(modelMapper.map(value, SongDTO.class));
+			}
 		}
 		return ret;
 	}

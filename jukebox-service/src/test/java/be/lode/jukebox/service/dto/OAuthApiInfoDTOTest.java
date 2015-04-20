@@ -2,14 +2,13 @@ package be.lode.jukebox.service.dto;
 
 import static org.junit.Assert.assertEquals;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import be.lode.jukebox.business.model.Jukebox;
 
 public class OAuthApiInfoDTOTest {
 
@@ -31,9 +30,10 @@ public class OAuthApiInfoDTOTest {
 
 	@Test
 	public void testEquals() {
-		EqualsVerifier.forClass(Jukebox.class).usingGetClass().verify();
+		EqualsVerifier.forClass(OAuthApiInfoDTO.class).usingGetClass()
+				.suppress(Warning.NONFINAL_FIELDS).verify();
 	}
-	
+
 	@Test
 	public void testToString() {
 		OAuthApiInfoDTO o = new OAuthApiInfoDTO();
