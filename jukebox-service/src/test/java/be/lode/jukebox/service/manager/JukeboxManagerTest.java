@@ -28,17 +28,17 @@ import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
 import be.lode.jukebox.service.dto.SongDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
-import be.lode.setup.ClearThenSetupTestDBData;
+import be.lode.setup.ResetDBSetupTestData;
 
 public class JukeboxManagerTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		ClearThenSetupTestDBData.run();
+		ResetDBSetupTestData.run();
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		ClearThenSetupTestDBData.run();
+		ResetDBSetupTestData.run();
 	}
 
 	private JukeboxModelMapper mapper;
@@ -46,7 +46,7 @@ public class JukeboxManagerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ClearThenSetupTestDBData.run();
+		ResetDBSetupTestData.run();
 		mgr = new JukeboxManager();
 		mapper = new JukeboxModelMapper();
 	}
