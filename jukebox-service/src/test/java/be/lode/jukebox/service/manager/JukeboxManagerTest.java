@@ -42,6 +42,7 @@ public class JukeboxManagerTest {
 	}
 
 	private JukeboxModelMapper mapper;
+
 	private JukeboxManager mgr;
 
 	@Before
@@ -52,16 +53,125 @@ public class JukeboxManagerTest {
 	}
 
 	@Test
-	public void testgetAllSongs() {
-		assertNotNull("all songs", mgr.getAllSongs());
-		assertTrue(mgr.getAllSongs().size() > 0);
-		for (SongDTO songDTO : mgr.getAllSongs()) {
-			assertNotNull(songDTO);
-			assertNotNull(songDTO.getId());
+	public void testAddSongSource() {
+		Song s1 = new Song("testArtist1", "testTitle1", "testPath1");
+		Song s2 = new Song("testArtist2", "testTitle2", "testPath2");
+		Song s3 = new Song("testArtist3", "testTitle3", "testPath3");
+		Playlist pl = new Playlist("testAddSong");
+		Repository<Song> sRepo = new SongRepository(mgr.getEmf());
+		s1 = sRepo.save(s1);
+		s2 = sRepo.save(s2);
+		s3 = sRepo.save(s3);
+		pl.addSong(s1);
+		pl.addSong(s2);
+		pl.addSong(s3);
+
+		Repository<Playlist> pRepo = new PlaylistRepository(mgr.getEmf());
+		pl = pRepo.save(pl);
+		JukeboxModelMapper mapper = new JukeboxModelMapper();
+		mgr.setCurrentPlaylist(mapper.map(pl, PlaylistDTO.class));
+
+		SongDTO dto1 = mapper.map(s1, SongDTO.class);
+		dto1.setPlayListOrder("0");
+		SongDTO dto2 = mapper.map(s2, SongDTO.class);
+		dto2.setPlayListOrder("1");
+		SongDTO dto3 = mapper.map(s3, SongDTO.class);
+		dto3.setPlayListOrder("2");
+		Playlist test = pRepo.find(mapper.map(mgr.getCurrentPlaylistDTO(),
+				Playlist.class));
+		for (Map.Entry<Integer, Song> entry : test.getSongs().entrySet()) {
+			if (entry.getKey().equals(0)) {
+				assertEquals(s1.getArtist(), entry.getValue().getArtist());
+			} else if (entry.getKey().equals(1)) {
+				assertEquals(s2.getArtist(), entry.getValue().getArtist());
+			} else if (entry.getKey().equals(2)) {
+				assertEquals(s3.getArtist(), entry.getValue().getArtist());
+			}
+		}
+		SongDTO dto4 = new SongDTO();
+		dto4.setArtist("dto4Art");
+		dto4.setPath("dto4Path");
+		dto4.setTitle("dto4titl");
+
+		Song s4 = mapper.map(dto4, Song.class);
+		s4 = sRepo.save(s4);
+		dto4 = mapper.map(s4, SongDTO.class);
+		mgr.addSong(dto4);
+		test = pRepo.find(mapper.map(mgr.getCurrentPlaylistDTO(),
+				Playlist.class));
+		for (Map.Entry<Integer, Song> entry : test.getSongs().entrySet()) {
+			if (entry.getKey().equals(0)) {
+				assertEquals(s1.getArtist(), entry.getValue().getArtist());
+			} else if (entry.getKey().equals(1)) {
+				assertEquals(s2.getArtist(), entry.getValue().getArtist());
+			} else if (entry.getKey().equals(2)) {
+				assertEquals(s3.getArtist(), entry.getValue().getArtist());
+			} else if (entry.getKey().equals(3)) {
+				assertEquals(s4.getArtist(), entry.getValue().getArtist());
+			}
 		}
 	}
 
-	
+	@Test
+	public void testAddSongSourceTarget() {
+		Song s1 = new Song("testArtist1", "testTitle1", "testPath1");
+		Song s2 = new Song("testArtist2", "testTitle2", "testPath2");
+		Song s3 = new Song("testArtist3", "testTitle3", "testPath3");
+		Playlist pl = new Playlist("testAddSong");
+		Repository<Song> sRepo = new SongRepository(mgr.getEmf());
+		s1 = sRepo.save(s1);
+		s2 = sRepo.save(s2);
+		s3 = sRepo.save(s3);
+		pl.addSong(s1);
+		pl.addSong(s2);
+		pl.addSong(s3);
+
+		Repository<Playlist> pRepo = new PlaylistRepository(mgr.getEmf());
+		pl = pRepo.save(pl);
+		JukeboxModelMapper mapper = new JukeboxModelMapper();
+		mgr.setCurrentPlaylist(mapper.map(pl, PlaylistDTO.class));
+
+		SongDTO dto1 = mapper.map(s1, SongDTO.class);
+		dto1.setPlayListOrder("0");
+		SongDTO dto2 = mapper.map(s2, SongDTO.class);
+		dto2.setPlayListOrder("1");
+		SongDTO dto3 = mapper.map(s3, SongDTO.class);
+		dto3.setPlayListOrder("2");
+		Playlist test = pRepo.find(mapper.map(mgr.getCurrentPlaylistDTO(),
+				Playlist.class));
+		for (Map.Entry<Integer, Song> entry : test.getSongs().entrySet()) {
+			if (entry.getKey().equals(0)) {
+				assertEquals(s1.getArtist(), entry.getValue().getArtist());
+			} else if (entry.getKey().equals(1)) {
+				assertEquals(s2.getArtist(), entry.getValue().getArtist());
+			} else if (entry.getKey().equals(2)) {
+				assertEquals(s3.getArtist(), entry.getValue().getArtist());
+			}
+		}
+		SongDTO dto4 = new SongDTO();
+		dto4.setArtist("dto4Art");
+		dto4.setPath("dto4Path");
+		dto4.setTitle("dto4titl");
+
+		Song s4 = mapper.map(dto4, Song.class);
+		s4 = sRepo.save(s4);
+		dto4 = mapper.map(s4, SongDTO.class);
+		mgr.addSong(dto4, dto2);
+		test = pRepo.find(mapper.map(mgr.getCurrentPlaylistDTO(),
+				Playlist.class));
+		for (Map.Entry<Integer, Song> entry : test.getSongs().entrySet()) {
+			if (entry.getKey().equals(0)) {
+				assertEquals(s1.getArtist(), entry.getValue().getArtist());
+			} else if (entry.getKey().equals(1)) {
+				assertEquals(s4.getArtist(), entry.getValue().getArtist());
+			} else if (entry.getKey().equals(2)) {
+				assertEquals(s2.getArtist(), entry.getValue().getArtist());
+			} else if (entry.getKey().equals(3)) {
+				assertEquals(s3.getArtist(), entry.getValue().getArtist());
+			}
+		}
+	}
+
 	@Test
 	public void testCreateNewJukebox() {
 		AccountDTO oDTO = new AccountDTO();
@@ -83,6 +193,105 @@ public class JukeboxManagerTest {
 				.containsKey(acc));
 		assertEquals(Role.Administrator, current.getAccountRoles().get(acc));
 
+	}
+
+	@Test
+	public void testGetAccount() {
+		AccountDTO oDTO = new AccountDTO();
+		oDTO.setEmailAddress("emailAddress");
+		oDTO.setFirstName("firstName");
+		oDTO.setLastName("lastName");
+		oDTO.setServiceId("10153294269263586");
+		oDTO.setServiceName("facebook");
+		oDTO.setId("2");
+		AccountDTO getO = mgr.getAccount(oDTO);
+
+		assertEquals(oDTO.getId(), getO.getId());
+		assertEquals("lode.deckers@gmail.com", getO.getEmailAddress());
+		assertEquals("Lode", getO.getFirstName());
+		assertEquals("Deckers", getO.getLastName());
+		assertEquals(oDTO.getServiceId(), getO.getServiceId());
+		assertEquals(oDTO.getServiceName(), getO.getServiceName());
+
+		oDTO = new AccountDTO();
+		oDTO.setEmailAddress("emailAddress");
+		oDTO.setFirstName("firstName");
+		oDTO.setLastName("lastName");
+		oDTO.setServiceId("serviceId");
+		oDTO.setServiceName("serviceName");
+		oDTO.setId("3");
+		getO = mgr.getAccount(oDTO);
+
+		assertEquals(oDTO.getId(), getO.getId());
+		assertEquals(oDTO.getEmailAddress(), getO.getEmailAddress());
+		assertEquals(oDTO.getFirstName(), getO.getFirstName());
+		assertEquals(oDTO.getLastName(), getO.getLastName());
+		assertEquals(oDTO.getServiceId(), getO.getServiceId());
+		assertEquals(oDTO.getServiceName(), getO.getServiceName());
+	}
+
+	@Test
+	public void testgetAllSongs() {
+		assertNotNull("all songs", mgr.getAllSongs());
+		assertTrue(mgr.getAllSongs().size() > 0);
+		for (SongDTO songDTO : mgr.getAllSongs()) {
+			assertNotNull(songDTO);
+			assertNotNull(songDTO.getId());
+		}
+	}
+
+	@Test
+	public void testGetJukeboxes() {
+		AccountDTO oDTO = new AccountDTO();
+		oDTO.setEmailAddress("emailAddress");
+		oDTO.setFirstName("firstName");
+		oDTO.setLastName("lastName");
+		oDTO.setServiceId("10153294269263586");
+		oDTO.setServiceName("facebook");
+		oDTO.setId("2");
+		AccountDTO getO = mgr.getAccount(oDTO);
+		List<JukeboxDTO> jbList = mgr.getJukeboxes(getO);
+		assertNotNull("List not null", jbList);
+		assertTrue("list not empty", jbList.size() > 0);
+	}
+
+	@Test
+	public void testGetSavedPlaylists() {
+		Jukebox jb = new Jukebox();
+		for (int i = 0; i < 5; i++) {
+			Playlist pl = new Playlist("test" + Integer.toString(i));
+			Repository<Playlist> pRepo = new PlaylistRepository(mgr.getEmf());
+			pl = pRepo.save(pl);
+			jb.getSavedPlaylists().add(pl);
+		}
+		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
+		jb = jRepo.save(jb);
+
+		JukeboxDTO jbDTO = mapper.map(jb, JukeboxDTO.class);
+		assertNotNull(mgr.getSavedPlaylists(jbDTO));
+
+		assertEquals(5, mgr.getSavedPlaylists(jbDTO).size());
+	}
+
+	@Test
+	public void testIsValidEmailAddress() {
+		String test = "";
+		test = "test@test.com";
+		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
+		test = "te.st@test.com";
+		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
+		test = "test@te.st.com";
+		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
+		test = "tes.t@tes.t.com";
+		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
+		test = "test@testcom";
+		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
+		test = "4test@test.comcom";
+		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
+		test = "testtestcom";
+		assertFalse(test + " - not valid", mgr.isValidEmailAddress(test));
+		test = "testtest.com";
+		assertFalse(test + " - not valid", mgr.isValidEmailAddress(test));
 	}
 
 	@Test
@@ -127,140 +336,6 @@ public class JukeboxManagerTest {
 	}
 
 	@Test
-	public void testAddSong() {
-		Song s1 = new Song("testArtist1", "testTitle1", "testPath1");
-		Song s2 = new Song("testArtist2", "testTitle2", "testPath2");
-		Song s3 = new Song("testArtist3", "testTitle3", "testPath3");
-		Playlist pl = new Playlist("testAddSong");
-		Repository<Song> sRepo = new SongRepository(mgr.getEmf());
-		s1 = sRepo.save(s1);
-		s2 = sRepo.save(s2);
-		s3 = sRepo.save(s3);
-		pl.addSong(s1);
-		pl.addSong(s2);
-		pl.addSong(s3);
-
-		Repository<Playlist> pRepo = new PlaylistRepository(mgr.getEmf());
-		pl = pRepo.save(pl);
-		JukeboxModelMapper mapper = new JukeboxModelMapper();
-		mgr.setCurrentPlaylist(mapper.map(pl, PlaylistDTO.class));
-
-		SongDTO dto1 = mapper.map(s1, SongDTO.class);
-		dto1.setPlayListOrder("0");
-		SongDTO dto2 = mapper.map(s2, SongDTO.class);
-		dto2.setPlayListOrder("1");
-		SongDTO dto3 = mapper.map(s3, SongDTO.class);
-		dto3.setPlayListOrder("2");
-		Playlist test = pRepo.find(mapper.map(mgr.getCurrentPlaylistDTO(),
-				Playlist.class));
-		for (Map.Entry<Integer, Song> entry : test.getSongs().entrySet()) {
-			if (entry.getKey().equals(0)) {
-				assertEquals(s1.getArtist(), entry.getValue().getArtist());
-			} else if (entry.getKey().equals(1)) {
-				assertEquals(s2.getArtist(), entry.getValue().getArtist());
-			}
-			else if (entry.getKey().equals(2)) {
-				assertEquals(s3.getArtist(), entry.getValue().getArtist());
-			}
-		}
-		SongDTO dto4 = new SongDTO();
-		dto4.setArtist("dto4Art");
-		dto4.setPath("dto4Path");
-		dto4.setTitle("dto4titl");
-		
-		Song s4 = mapper.map(dto4, Song.class);
-		s4 = sRepo.save(s4);
-		dto4 = mapper.map(s4, SongDTO.class);
-		mgr.addSong(dto4, dto2);
-		test = pRepo.find(mapper.map(mgr.getCurrentPlaylistDTO(),
-				Playlist.class));
-		for (Map.Entry<Integer, Song> entry : test.getSongs().entrySet()) {
-			if (entry.getKey().equals(0)) {
-				assertEquals(s1.getArtist(), entry.getValue().getArtist());
-			} else if (entry.getKey().equals(1)) {
-				assertEquals(s4.getArtist(), entry.getValue().getArtist());
-			}
-			else if (entry.getKey().equals(2)) {
-				assertEquals(s2.getArtist(), entry.getValue().getArtist());
-			}
-			else if (entry.getKey().equals(3)) {
-				assertEquals(s3.getArtist(), entry.getValue().getArtist());
-			}
-		}
-	}
-
-	@Test
-	public void testGetAccount() {
-		AccountDTO oDTO = new AccountDTO();
-		oDTO.setEmailAddress("emailAddress");
-		oDTO.setFirstName("firstName");
-		oDTO.setLastName("lastName");
-		oDTO.setServiceId("10153294269263586");
-		oDTO.setServiceName("facebook");
-		oDTO.setId("1");
-		AccountDTO getO = mgr.getAccount(oDTO);
-
-		assertEquals(oDTO.getId(), getO.getId());
-		assertEquals("lode.deckers@gmail.com", getO.getEmailAddress());
-		assertEquals("Lode", getO.getFirstName());
-		assertEquals("Deckers", getO.getLastName());
-		assertEquals(oDTO.getServiceId(), getO.getServiceId());
-		assertEquals(oDTO.getServiceName(), getO.getServiceName());
-
-		oDTO = new AccountDTO();
-		oDTO.setEmailAddress("emailAddress");
-		oDTO.setFirstName("firstName");
-		oDTO.setLastName("lastName");
-		oDTO.setServiceId("serviceId");
-		oDTO.setServiceName("serviceName");
-		oDTO.setId("1");
-		getO = mgr.getAccount(oDTO);
-
-		assertEquals(oDTO.getId(), getO.getId());
-		assertEquals(oDTO.getEmailAddress(), getO.getEmailAddress());
-		assertEquals(oDTO.getFirstName(), getO.getFirstName());
-		assertEquals(oDTO.getLastName(), getO.getLastName());
-		assertEquals(oDTO.getServiceId(), getO.getServiceId());
-		assertEquals(oDTO.getServiceName(), getO.getServiceName());
-	}
-
-	@Test
-	public void testGetJukeboxes() {
-		AccountDTO oDTO = new AccountDTO();
-		oDTO.setEmailAddress("emailAddress");
-		oDTO.setFirstName("firstName");
-		oDTO.setLastName("lastName");
-		oDTO.setServiceId("10153294269263586");
-		oDTO.setServiceName("facebook");
-		oDTO.setId("1");
-		AccountDTO getO = mgr.getAccount(oDTO);
-		List<JukeboxDTO> jbList = mgr.getJukeboxes(getO);
-		assertNotNull("List not null", jbList);
-		assertTrue("list not empty", jbList.size() > 0);
-	}
-
-	@Test
-	public void testIsValidEmailAddress() {
-		String test = "";
-		test = "test@test.com";
-		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
-		test = "te.st@test.com";
-		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
-		test = "test@te.st.com";
-		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
-		test = "tes.t@tes.t.com";
-		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
-		test = "test@testcom";
-		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
-		test = "4test@test.comcom";
-		assertTrue(test + " - valid", mgr.isValidEmailAddress(test));
-		test = "testtestcom";
-		assertFalse(test + " - not valid", mgr.isValidEmailAddress(test));
-		test = "testtest.com";
-		assertFalse(test + " - not valid", mgr.isValidEmailAddress(test));
-	}
-
-	@Test
 	public void testSaveAccountDTO() {
 		AccountDTO oDTO = new AccountDTO();
 		oDTO.setEmailAddress("newaddress");
@@ -268,7 +343,7 @@ public class JukeboxManagerTest {
 		oDTO.setLastName("newLast");
 		oDTO.setServiceId("10153294269263586");
 		oDTO.setServiceName("facebook");
-		oDTO.setId("1");
+		oDTO.setId("3");
 		AccountDTO saved = mgr.save(oDTO);
 
 		assertEquals(oDTO.getId(), saved.getId());
@@ -299,20 +374,18 @@ public class JukeboxManagerTest {
 	}
 
 	@Test
-	public void testGetSavedPlaylists() {
-		Jukebox jb = new Jukebox();
-		for (int i = 0; i < 5; i++) {
-			Playlist pl = new Playlist("test" + Integer.toString(i));
-			Repository<Playlist> pRepo = new PlaylistRepository(mgr.getEmf());
-			pl = pRepo.save(pl);
-			jb.getSavedPlaylists().add(pl);
+	public void testSetCurrentSong() {
+		Repository<Song> sRepo = new SongRepository(mgr.getEmf());
+		JukeboxModelMapper mapper = new JukeboxModelMapper();
+		Song s = new Song();
+		{
+			for (Song songitem : sRepo.getList()) {
+				s = songitem;
+				SongDTO sDTO = mapper.map(s, SongDTO.class);
+				mgr.setCurrentSong(sDTO);
+
+				assertEquals(sDTO, mgr.getCurrentSongDTO());
+			}
 		}
-		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
-		jb = jRepo.save(jb);
-
-		JukeboxDTO jbDTO = mapper.map(jb, JukeboxDTO.class);
-		assertNotNull(mgr.getSavedPlaylists(jbDTO));
-
-		assertEquals(5, mgr.getSavedPlaylists(jbDTO).size());
 	}
 }
