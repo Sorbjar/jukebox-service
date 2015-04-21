@@ -12,5 +12,4 @@ public class SongProvider implements Provider<Song> {
 		SongDTO s = SongDTO.class.cast(request.getSource());
 		return new Song(s.getArtist(), s.getTitle(), s.getPath());
 	}
-
 }

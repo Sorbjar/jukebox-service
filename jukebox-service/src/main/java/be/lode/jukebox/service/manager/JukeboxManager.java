@@ -27,6 +27,7 @@ import be.lode.jukebox.service.dto.SongDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 import be.lode.oauth.OAuthButton.IOAuthUser;
 
+//TODO 700 manager uit elkaar halen
 public class JukeboxManager extends Observable {
 	private Repository<Account> accountRepo;
 	private Jukebox currentJukebox;
