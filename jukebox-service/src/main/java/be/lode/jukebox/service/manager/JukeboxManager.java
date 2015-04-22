@@ -275,8 +275,12 @@ public class JukeboxManager extends Observable {
 
 	private Jukebox updateEditedFields(Jukebox jb, JukeboxDTO dto) {
 		Jukebox newFields = modelMapper.map(dto, Jukebox.class);
-		newFields.setAccountRoles(jb.getAccountRoles());
-		newFields.setSavedPlaylists(jb.getSavedPlaylists());
+		if (jb != null) {
+			if (jb.getAccountRoles() != null)
+				newFields.setAccountRoles(jb.getAccountRoles());
+			if (jb.getSavedPlaylists() != null)
+				newFields.setSavedPlaylists(jb.getSavedPlaylists());
+		}
 		return newFields;
 	}
 
