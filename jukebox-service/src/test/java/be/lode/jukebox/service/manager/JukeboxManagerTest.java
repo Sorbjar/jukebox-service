@@ -353,6 +353,23 @@ public class JukeboxManagerTest {
 		assertEquals(oDTO.getServiceId(), saved.getServiceId());
 		assertEquals(oDTO.getServiceName(), saved.getServiceName());
 	}
+	
+	@Test
+	public void testSaveJukeboxDTO() {
+		JukeboxDTO oDTO = new JukeboxDTO();
+		oDTO.setName("testSaveJukeboxDTO");
+		JukeboxDTO saved = mgr.save(oDTO);
+
+		assertEquals(oDTO.getName(), saved.getName());
+		
+		oDTO = new JukeboxDTO();
+		oDTO.setName("testSaveJukeboxDTO2");
+		oDTO.setId("6");
+		saved = mgr.save(oDTO);
+
+		assertEquals(oDTO.getName(), saved.getName());
+		assertEquals(oDTO.getId(), saved.getId());
+	}
 
 	@Test
 	public void testSetCurrentJukeboxJukeboxDTO() {

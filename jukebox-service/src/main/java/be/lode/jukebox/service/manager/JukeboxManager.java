@@ -202,6 +202,15 @@ public class JukeboxManager extends Observable {
 		return modelMapper.map(acc, AccountDTO.class);
 	}
 
+	public JukeboxDTO save(JukeboxDTO dto) {
+		Jukebox jb = jukeboxRepo.find(modelMapper.map(dto, Jukebox.class));
+		jb = updateEditedFields(jb, dto);
+		currentJukebox = jukeboxRepo.save(jb);
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
+		return modelMapper.map(jb, JukeboxDTO.class);
+	}
+
 	public void saveCurrentPlayListToJukebox() {
 		currentJukebox = jukeboxRepo.find(currentJukebox);
 		currentJukebox.getSavedPlaylists().add(currentPlaylist);
@@ -247,6 +256,13 @@ public class JukeboxManager extends Observable {
 		currentSong = song;
 	}
 
+	public void setNewCurrentPlaylist(SongDTO sDTO) {
+		Song s = modelMapper.map(sDTO, Song.class);
+		currentPlaylist = new Playlist("Unsaved playlist");
+		currentPlaylist.addSong(s);
+		setCurrentPlaylist(currentPlaylist);
+	}
+
 	// TODO 900 test speed, if needed change method
 	private AccountDTO findAccountFromList(AccountDTO o) {
 		Account acc = modelMapper.map(o, Account.class);
@@ -257,11 +273,11 @@ public class JukeboxManager extends Observable {
 		return modelMapper.map(accountRepo.save(acc), AccountDTO.class);
 	}
 
-	public void setNewCurrentPlaylist(SongDTO sDTO) {
-		Song s = modelMapper.map(sDTO, Song.class);
-		currentPlaylist = new Playlist("Unsaved playlist");
-		currentPlaylist.addSong(s);
-		setCurrentPlaylist(currentPlaylist);	
+	private Jukebox updateEditedFields(Jukebox jb, JukeboxDTO dto) {
+		Jukebox newFields = modelMapper.map(dto, Jukebox.class);
+		newFields.setAccountRoles(jb.getAccountRoles());
+		newFields.setSavedPlaylists(jb.getSavedPlaylists());
+		return newFields;
 	}
 
 }
