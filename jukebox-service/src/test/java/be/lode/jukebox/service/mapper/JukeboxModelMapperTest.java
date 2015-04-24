@@ -79,6 +79,8 @@ public class JukeboxModelMapperTest {
 
 		assertEquals(Long.valueOf(oDTO.getId()).longValue(), o.getId());
 		assertEquals(oDTO.getName(), o.getName());
+		assertEquals(Boolean.parseBoolean(oDTO.getLooped()), o.isLooped());
+		assertEquals(Boolean.parseBoolean(oDTO.getRandom()), o.isRandom());
 	}
 
 	@Test
@@ -94,6 +96,8 @@ public class JukeboxModelMapperTest {
 
 		assertEquals(String.valueOf(o.getId()), oDTO.getId());
 		assertEquals(o.getName(), oDTO.getName());
+		assertEquals(String.valueOf(o.isLooped()), oDTO.getLooped());
+		assertEquals(String.valueOf(o.isRandom()), oDTO.getRandom());
 	}
 
 	@Test

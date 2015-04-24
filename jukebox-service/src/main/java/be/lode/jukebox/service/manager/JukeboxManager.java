@@ -31,13 +31,13 @@ import be.lode.oauth.OAuthButton.IOAuthUser;
 public class JukeboxManager extends Observable {
 	private Repository<Account> accountRepo;
 	private Jukebox currentJukebox;
-	private Playlist currentPlaylist;
 	private Song currentSong;
 	private EntityManagerFactory emf;
 	private Repository<Jukebox> jukeboxRepo;
 	private JukeboxModelMapper modelMapper;
 	private Repository<Playlist> playlistRepo;
 	private Repository<Song> songRepo;
+	private int currentSongInt;
 
 	public JukeboxManager() {
 		super();
@@ -51,9 +51,10 @@ public class JukeboxManager extends Observable {
 
 	public void addSong(SongDTO sourceItemId) {
 		Song source = modelMapper.map(sourceItemId, Song.class);
-		currentPlaylist.addSong(source);
-		playlistRepo.save(currentPlaylist);
-		setCurrentPlaylist(currentPlaylist);
+		currentJukebox.getCurrentPlaylist().addSong(source);
+
+		Playlist cpl = playlistRepo.save(currentJukebox.getCurrentPlaylist());
+		setCurrentPlaylist(cpl);
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 
@@ -61,12 +62,14 @@ public class JukeboxManager extends Observable {
 
 	public void addSong(SongDTO sourceItemId, SongDTO targetItemId) {
 		Song source = modelMapper.map(sourceItemId, Song.class);
-		currentPlaylist.addSong(source);
-		currentPlaylist.moveSong(currentPlaylist.getSongs().lastKey(),
+		currentJukebox.getCurrentPlaylist().addSong(source);
+		currentJukebox.getCurrentPlaylist().moveSong(
+				currentJukebox.getCurrentPlaylist().getSongs().lastKey(),
 				Integer.parseInt(targetItemId.getPlayListOrder()));
 
-		playlistRepo.save(currentPlaylist);
-		setCurrentPlaylist(currentPlaylist);
+		Playlist cpl = playlistRepo.save(currentJukebox.getCurrentPlaylist());
+		setCurrentPlaylist(cpl);
+
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 	}
@@ -106,16 +109,20 @@ public class JukeboxManager extends Observable {
 	}
 
 	public PlaylistDTO getCurrentPlaylistDTO() {
-		if (currentPlaylist == null) {
-			currentPlaylist = new Playlist("Unsaved playlist");
-			setCurrentPlaylist(currentPlaylist);
+		if (currentJukebox.getCurrentPlaylist() == null) {
+			Playlist cpl = new Playlist("Unsaved playlist");
+			setCurrentPlaylist(cpl);
 		}
-		return modelMapper.map(currentPlaylist, PlaylistDTO.class);
+		return modelMapper.map(currentJukebox.getCurrentPlaylist(),
+				PlaylistDTO.class);
 	}
 
 	public SongDTO getCurrentSongDTO() {
-		if (currentSong != null)
-			return modelMapper.map(currentSong, SongDTO.class);
+		if (currentSong != null) {
+			SongDTO dto = modelMapper.map(currentSong, SongDTO.class);
+			dto.setPlayListOrder(String.valueOf(currentSongInt));
+			return dto;
+		}
 		return null;
 	}
 
@@ -189,10 +196,11 @@ public class JukeboxManager extends Observable {
 	}
 
 	public void reorderPlaylist(SongDTO source, SongDTO target) {
-		currentPlaylist.moveSong(Integer.parseInt(source.getPlayListOrder()),
+		currentJukebox.getCurrentPlaylist().moveSong(
+				Integer.parseInt(source.getPlayListOrder()),
 				Integer.parseInt(target.getPlayListOrder()));
-		playlistRepo.save(currentPlaylist);
-		setCurrentPlaylist(currentPlaylist);
+		Playlist cpl = playlistRepo.save(currentJukebox.getCurrentPlaylist());
+		setCurrentPlaylist(cpl);
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 	}
@@ -213,7 +221,8 @@ public class JukeboxManager extends Observable {
 
 	public void saveCurrentPlayListToJukebox() {
 		currentJukebox = jukeboxRepo.find(currentJukebox);
-		currentJukebox.getSavedPlaylists().add(currentPlaylist);
+		currentJukebox.getSavedPlaylists().add(
+				currentJukebox.getCurrentPlaylist());
 		currentJukebox = jukeboxRepo.save(currentJukebox);
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
@@ -235,17 +244,19 @@ public class JukeboxManager extends Observable {
 		if (playlistRepo.find(playlist) == null)
 			playlist = playlistRepo.save(playlist);
 		playlist = playlistRepo.find(playlist);
-		this.currentPlaylist = playlist;
+		currentJukebox.setCurrentPlaylist(playlist);
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 	}
 
 	public void setCurrentPlaylist(PlaylistDTO playlistDTO) {
+		if (currentJukebox == null)
+			currentJukebox = new Jukebox("Unsaved Jukebox", new Account());
 		Playlist pl = modelMapper.map(playlistDTO, Playlist.class);
 		if (playlistRepo.find(pl) == null)
 			pl = playlistRepo.save(pl);
 		pl = playlistRepo.find(pl);
-		this.currentPlaylist = pl;
+		currentJukebox.setCurrentPlaylist(pl);
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 	}
@@ -254,13 +265,18 @@ public class JukeboxManager extends Observable {
 		Song song = modelMapper.map(songDTO, Song.class);
 		song = songRepo.find(song);
 		currentSong = song;
+		currentSongInt = Integer.parseInt(songDTO.getPlayListOrder());
 	}
 
 	public void setNewCurrentPlaylist(SongDTO sDTO) {
 		Song s = modelMapper.map(sDTO, Song.class);
-		currentPlaylist = new Playlist("Unsaved playlist");
-		currentPlaylist.addSong(s);
-		setCurrentPlaylist(currentPlaylist);
+		setCurrentPlaylist(new Playlist("Unsaved playlist"));
+
+		currentJukebox.getCurrentPlaylist().addSong(s);
+		Playlist cpl = playlistRepo.save(currentJukebox.getCurrentPlaylist());
+		setCurrentPlaylist(cpl);
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 	}
 
 	// TODO 900 test speed, if needed change method
@@ -284,4 +300,14 @@ public class JukeboxManager extends Observable {
 		return newFields;
 	}
 
+	// TODO 010 testing
+	public SongDTO getNextSong() {
+		if (currentJukebox != null) {
+			Song song = currentJukebox.getNextSong(currentSongInt);
+			SongDTO dto = modelMapper.map(song, SongDTO.class);
+			dto.setPlayListOrder(String.valueOf(currentSongInt));
+			return dto;
+		}
+		return null;
+	}
 }

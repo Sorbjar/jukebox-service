@@ -2,7 +2,9 @@ package be.lode.jukebox.service.dto;
 
 public class JukeboxDTO {
 	private String id;
+	private String looped;
 	private String name;
+	private String random;
 	
 	public JukeboxDTO() {
 		super();
@@ -31,8 +33,16 @@ public class JukeboxDTO {
 		return id;
 	}
 
+	public String getLooped() {
+		return looped;
+	}
+
 	public String getName() {
 		return name;
+	}
+
+	public String getRandom() {
+		return random;
 	}
 
 	@Override
@@ -47,8 +57,16 @@ public class JukeboxDTO {
 		this.id = id;
 	}
 
+	public void setLooped(String looped) {
+		this.looped = looped;
+	}
+
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setRandom(String random) {
+		this.random = random;
 	}
 
 	@Override
