@@ -32,12 +32,12 @@ public class JukeboxManager extends Observable {
 	private Repository<Account> accountRepo;
 	private Jukebox currentJukebox;
 	private Song currentSong;
+	private int currentSongInt;
 	private EntityManagerFactory emf;
 	private Repository<Jukebox> jukeboxRepo;
 	private JukeboxModelMapper modelMapper;
 	private Repository<Playlist> playlistRepo;
 	private Repository<Song> songRepo;
-	private int currentSongInt;
 
 	public JukeboxManager() {
 		super();
@@ -72,6 +72,18 @@ public class JukeboxManager extends Observable {
 
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
+	}
+
+	public void changeLoopState() {
+		currentJukebox.setLooped(!currentJukebox.isLooped());
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
+	}
+
+	public void changeRandomState() {
+		currentJukebox.setRandom(!currentJukebox.isRandom());
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
 	}
 
 	public void createNewJukebox(AccountDTO oDTO) {
@@ -143,6 +155,18 @@ public class JukeboxManager extends Observable {
 		return retList;
 	}
 
+	public SongDTO getNextSong() {
+		if (currentJukebox != null) {
+			Song song = currentJukebox.getNextSong(currentSongInt);
+			if (song != null) {
+				SongDTO dto = modelMapper.map(song, SongDTO.class);
+				dto.setPlayListOrder(String.valueOf(currentSongInt));
+				return dto;
+			}
+		}
+		return null;
+	}
+
 	public List<PlaylistDTO> getSavedPlaylists(JukeboxDTO jukeboxDTO) {
 		Jukebox jb = modelMapper.map(jukeboxDTO, Jukebox.class);
 		jb = jukeboxRepo.find(jb);
@@ -184,6 +208,18 @@ public class JukeboxManager extends Observable {
 		return findAccountFromList(o);
 	}
 
+	public boolean isLooped() {
+		if (currentJukebox != null)
+			return currentJukebox.isLooped();
+		return false;
+	}
+
+	public boolean isRandom() {
+		if (currentJukebox != null)
+			return currentJukebox.isRandom();
+		return false;
+	}
+
 	public boolean isValidEmailAddress(String email) {
 		boolean result = true;
 		try {
@@ -219,11 +255,13 @@ public class JukeboxManager extends Observable {
 		return modelMapper.map(jb, JukeboxDTO.class);
 	}
 
-	public void saveCurrentPlayListToJukebox() {
+	public void saveCurrentPlayListToJukebox(String name) {
 		currentJukebox = jukeboxRepo.find(currentJukebox);
-		currentJukebox.getSavedPlaylists().add(
-				currentJukebox.getCurrentPlaylist());
+		currentJukebox.getCurrentPlaylist().setName(name);
+		Playlist cpl = playlistRepo.save(currentJukebox.getCurrentPlaylist());
+		currentJukebox.getSavedPlaylists().add(cpl);
 		currentJukebox = jukeboxRepo.save(currentJukebox);
+		setCurrentPlaylist(cpl);
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
 		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
@@ -265,7 +303,11 @@ public class JukeboxManager extends Observable {
 		Song song = modelMapper.map(songDTO, Song.class);
 		song = songRepo.find(song);
 		currentSong = song;
-		currentSongInt = Integer.parseInt(songDTO.getPlayListOrder());
+		try {
+			currentSongInt = Integer.parseInt(songDTO.getPlayListOrder());
+		} catch (NumberFormatException ex) {
+			currentSongInt = 0;
+		}
 	}
 
 	public void setNewCurrentPlaylist(SongDTO sDTO) {
@@ -300,13 +342,22 @@ public class JukeboxManager extends Observable {
 		return newFields;
 	}
 
-	// TODO 010 testing
-	public SongDTO getNextSong() {
+	public void setCurrentPlaylistName(String name) {
+		currentJukebox.getCurrentPlaylist().setName(name);
+		Playlist cpl = playlistRepo.save(currentJukebox.getCurrentPlaylist());
+		setCurrentPlaylist(cpl);
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
+	}
+
+	public SongDTO getPreviousSong() {
 		if (currentJukebox != null) {
-			Song song = currentJukebox.getNextSong(currentSongInt);
-			SongDTO dto = modelMapper.map(song, SongDTO.class);
-			dto.setPlayListOrder(String.valueOf(currentSongInt));
-			return dto;
+			Song song = currentJukebox.getPreviousSong(currentSongInt);
+			if (song != null) {
+				SongDTO dto = modelMapper.map(song, SongDTO.class);
+				dto.setPlayListOrder(String.valueOf(currentSongInt));
+				return dto;
+			}
 		}
 		return null;
 	}

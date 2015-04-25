@@ -22,7 +22,6 @@ public class WebServiceManager {
 		return custRepo.getAllArtists();
 	}
 	
-	//TODO 010 testing
 	public List<String> getAllTitles(String artist) {
 		return custRepo.getAllTitles(artist);
 	}
