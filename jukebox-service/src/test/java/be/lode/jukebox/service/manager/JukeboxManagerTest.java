@@ -310,7 +310,9 @@ public class JukeboxManagerTest {
 		SongDTO dto2 = mapper.map(s2, SongDTO.class);
 		dto2.setPlayListOrder("0");
 
-		assertEquals(dto2, mgr.getNextSong());
+		SongDTO test =  mgr.getNextSong();
+		assertEquals(dto2.getArtist(),test.getArtist());
+		assertEquals(dto2.getTitle(),test.getTitle());
 
 		o.getMandatoryPlaylist().addSong(s4);
 
