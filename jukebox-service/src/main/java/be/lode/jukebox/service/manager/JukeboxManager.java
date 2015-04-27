@@ -15,6 +15,7 @@ import be.lode.jukebox.business.model.Account;
 import be.lode.jukebox.business.model.Jukebox;
 import be.lode.jukebox.business.model.Playlist;
 import be.lode.jukebox.business.model.Song;
+import be.lode.jukebox.business.model.SongContainer;
 import be.lode.jukebox.business.repo.AccountRepository;
 import be.lode.jukebox.business.repo.JukeboxRepository;
 import be.lode.jukebox.business.repo.PlaylistRepository;
@@ -38,6 +39,7 @@ public class JukeboxManager extends Observable {
 	private JukeboxModelMapper modelMapper;
 	private Repository<Playlist> playlistRepo;
 	private Repository<Song> songRepo;
+	private boolean mandatory;
 
 	public JukeboxManager() {
 		super();
@@ -47,6 +49,7 @@ public class JukeboxManager extends Observable {
 		playlistRepo = new PlaylistRepository(emf);
 		songRepo = new SongRepository(emf);
 		modelMapper = new JukeboxModelMapper();
+		mandatory = false;
 	}
 
 	public void addSong(SongDTO sourceItemId) {
@@ -102,6 +105,20 @@ public class JukeboxManager extends Observable {
 		notifyObservers(UpdateArgs.JUKEBOXLIST);
 	}
 
+	public void deletePlaylist(PlaylistDTO playlistDTO) {
+		if (currentJukebox == null)
+			currentJukebox = new Jukebox("Unsaved Jukebox", new Account());
+		Playlist pl = modelMapper.map(playlistDTO, Playlist.class);
+		if (playlistRepo.find(pl) == null)
+			pl = playlistRepo.save(pl);
+		pl = playlistRepo.find(pl);
+		currentJukebox.getSavedPlaylists().remove(pl);
+		currentJukebox = jukeboxRepo.save(currentJukebox);
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
+
+	}
+
 	public AccountDTO getAccount(AccountDTO loggedInAccount) {
 		return findAccountFromList(loggedInAccount);
 	}
@@ -133,6 +150,7 @@ public class JukeboxManager extends Observable {
 		if (currentSong != null) {
 			SongDTO dto = modelMapper.map(currentSong, SongDTO.class);
 			dto.setPlayListOrder(String.valueOf(currentSongInt));
+			dto.setMandatory(String.valueOf(mandatory));
 			return dto;
 		}
 		return null;
@@ -143,7 +161,6 @@ public class JukeboxManager extends Observable {
 	}
 
 	public List<JukeboxDTO> getJukeboxes(AccountDTO acc) {
-		// TODO 900 check speed, if required change to stored procedure
 		ArrayList<JukeboxDTO> retList = new ArrayList<JukeboxDTO>();
 		if (acc != null) {
 			for (Jukebox jbItem : jukeboxRepo.getList()) {
@@ -155,13 +172,23 @@ public class JukeboxManager extends Observable {
 		return retList;
 	}
 
+	public PlaylistDTO getMandatoryPlaylistDTO() {
+		if (currentJukebox.getMandatoryPlaylist() == null) {
+			Playlist cpl = new Playlist("Mandatory");
+			currentJukebox.setMandatoryPlaylist(cpl);
+		}
+		return modelMapper.map(currentJukebox.getMandatoryPlaylist(),
+				PlaylistDTO.class);
+	}
+
 	public SongDTO getNextSong() {
 		if (currentJukebox != null) {
-			Song song = currentJukebox.getNextSong(currentSongInt);
-			int newSongInt = currentJukebox.getNextInt(currentSongInt);
-			if (song != null) {
-				SongDTO dto = modelMapper.map(song, SongDTO.class);
-				currentSongInt = newSongInt;
+			removeCurrentSongFromMandatoryPlaylist();
+			SongContainer sc = currentJukebox.getNextSong(currentSongInt);
+			if (sc != null) {
+				SongDTO dto = modelMapper.map(sc.getSong(), SongDTO.class);
+				currentSongInt = sc.getPlaylistOrder();
+				mandatory = sc.getMandatory();
 				dto.setPlayListOrder(String.valueOf(currentSongInt));
 				setCurrentSong(dto);
 				return dto;
@@ -170,13 +197,21 @@ public class JukeboxManager extends Observable {
 		return null;
 	}
 
+	private void removeCurrentSongFromMandatoryPlaylist() {
+		if (currentJukebox != null && mandatory) {
+			currentJukebox.removeMandatorySong(currentSong, currentSongInt);
+		}
+
+	}
+
 	public SongDTO getPreviousSong() {
 		if (currentJukebox != null) {
-			Song song = currentJukebox.getPreviousSong(currentSongInt);
-			int newSongInt = currentJukebox.getPreviousInt(currentSongInt);
-			if (song != null) {
-				SongDTO dto = modelMapper.map(song, SongDTO.class);
-				currentSongInt = newSongInt;
+			removeCurrentSongFromMandatoryPlaylist();
+			SongContainer sc = currentJukebox.getPreviousSong(currentSongInt);
+			if (sc != null) {
+				SongDTO dto = modelMapper.map(sc.getSong(), SongDTO.class);
+				currentSongInt = sc.getPlaylistOrder();
+				mandatory = sc.getMandatory();
 				dto.setPlayListOrder(String.valueOf(currentSongInt));
 				setCurrentSong(dto);
 				return dto;
@@ -249,6 +284,14 @@ public class JukeboxManager extends Observable {
 		return result;
 	}
 
+	public void removeSongFromCurrentPlaylist(SongDTO song) {
+		currentJukebox.getCurrentPlaylist().removeSong(
+				Integer.parseInt(song.getPlayListOrder()));
+		currentJukebox = jukeboxRepo.save(currentJukebox);
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
+	}
+
 	public void reorderPlaylist(SongDTO source, SongDTO target) {
 		currentJukebox.getCurrentPlaylist().moveSong(
 				Integer.parseInt(source.getPlayListOrder()),
@@ -313,7 +356,11 @@ public class JukeboxManager extends Observable {
 		if (playlistRepo.find(pl) == null)
 			pl = playlistRepo.save(pl);
 		pl = playlistRepo.find(pl);
-		currentJukebox.setCurrentPlaylist(pl);
+		pl = playlistRepo.save(pl);
+		Playlist copy = copyPlaylist(pl);
+		copy = playlistRepo.save(copy);	
+		currentJukebox.setCurrentPlaylist(copy);
+		currentJukebox = jukeboxRepo.save(currentJukebox);
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 	}
@@ -330,6 +377,7 @@ public class JukeboxManager extends Observable {
 		Song song = modelMapper.map(songDTO, Song.class);
 		song = songRepo.find(song);
 		currentSong = song;
+		mandatory = Boolean.parseBoolean(songDTO.getMandatory());
 		try {
 			currentSongInt = Integer.parseInt(songDTO.getPlayListOrder());
 		} catch (NumberFormatException ex) {
@@ -355,7 +403,6 @@ public class JukeboxManager extends Observable {
 		return copy;
 	}
 
-	// TODO 900 test speed, if needed change method
 	private AccountDTO findAccountFromList(AccountDTO o) {
 		Account acc = modelMapper.map(o, Account.class);
 		for (Account accItem : accountRepo.getList()) {
@@ -374,27 +421,5 @@ public class JukeboxManager extends Observable {
 				newFields.setSavedPlaylists(jb.getSavedPlaylists());
 		}
 		return newFields;
-	}
-
-	public void deletePlaylist(PlaylistDTO playlistDTO) {
-		if (currentJukebox == null)
-			currentJukebox = new Jukebox("Unsaved Jukebox", new Account());
-		Playlist pl = modelMapper.map(playlistDTO, Playlist.class);
-		if (playlistRepo.find(pl) == null)
-			pl = playlistRepo.save(pl);
-		pl = playlistRepo.find(pl);
-		currentJukebox.getSavedPlaylists().remove(pl);
-		currentJukebox = jukeboxRepo.save(currentJukebox);
-		setChanged();
-		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
-
-	}
-
-	public void removeSongFromCurrentPlaylist(SongDTO song) {
-		currentJukebox.getCurrentPlaylist().removeSong(
-				Integer.parseInt(song.getPlayListOrder()));
-		currentJukebox = jukeboxRepo.save(currentJukebox);
-		setChanged();
-		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 	}
 }

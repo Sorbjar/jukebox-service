@@ -7,12 +7,22 @@ public class SongDTO {
 	private String path;
 	private String playListOrder;
 	private String title;
+	private String mandatory;
+
+	public String getMandatory() {
+		return mandatory;
+	}
+
+	public void setMandatory(String mandatory) {
+		this.mandatory = mandatory;
+	}
 
 	public SongDTO() {
 		super();
 		this.artist = "";
 		this.title = "";
 		this.playListOrder = "";
+		this.mandatory = String.valueOf(false);
 	}
 
 	@Override
