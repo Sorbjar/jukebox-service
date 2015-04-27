@@ -351,7 +351,11 @@ public class JukeboxManager extends Observable {
 
 	public void setCurrentPlaylist(PlaylistDTO playlistDTO) {
 		if (currentJukebox == null)
-			currentJukebox = new Jukebox("Unsaved Jukebox", new Account());
+		{
+			Account acc = new Account();
+			acc = accountRepo.save(acc);
+			currentJukebox = new Jukebox("Unsaved Jukebox", acc);
+		}
 		Playlist pl = modelMapper.map(playlistDTO, Playlist.class);
 		if (playlistRepo.find(pl) == null)
 			pl = playlistRepo.save(pl);
@@ -421,5 +425,17 @@ public class JukeboxManager extends Observable {
 				newFields.setSavedPlaylists(jb.getSavedPlaylists());
 		}
 		return newFields;
+	}
+
+	public boolean isMandatory() {
+		return mandatory;
+	}
+
+	public AccountDTO getAccount(String serviceName, String serviceId) {
+		for (Account acc : accountRepo.getList()) {
+			if(acc.getServiceName().equals(serviceName)&& acc.getServiceId().equals(serviceId))
+				return modelMapper.map(acc, AccountDTO.class);
+		}
+		return null;
 	}
 }
