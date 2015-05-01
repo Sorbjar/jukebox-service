@@ -16,6 +16,7 @@ import be.lode.jukebox.business.model.Jukebox;
 import be.lode.jukebox.business.model.Playlist;
 import be.lode.jukebox.business.model.Song;
 import be.lode.jukebox.business.model.SongContainer;
+import be.lode.jukebox.business.model.enums.Role;
 import be.lode.jukebox.business.repo.AccountRepository;
 import be.lode.jukebox.business.repo.JukeboxRepository;
 import be.lode.jukebox.business.repo.PlaylistRepository;
@@ -138,12 +139,15 @@ public class JukeboxManager extends Observable {
 	}
 
 	public PlaylistDTO getCurrentPlaylistDTO() {
-		if (currentJukebox.getCurrentPlaylist() == null) {
-			Playlist cpl = new Playlist("Unsaved playlist");
-			setCurrentPlaylist(cpl);
+		if (currentJukebox != null) {
+			if (currentJukebox.getCurrentPlaylist() == null) {
+				Playlist cpl = new Playlist("Unsaved playlist");
+				setCurrentPlaylist(cpl);
+			}
+			return modelMapper.map(currentJukebox.getCurrentPlaylist(),
+					PlaylistDTO.class);
 		}
-		return modelMapper.map(currentJukebox.getCurrentPlaylist(),
-				PlaylistDTO.class);
+		return null;
 	}
 
 	public SongDTO getCurrentSongDTO() {
@@ -160,25 +164,32 @@ public class JukeboxManager extends Observable {
 		return emf;
 	}
 
-	public List<JukeboxDTO> getJukeboxes(AccountDTO acc) {
+	public List<JukeboxDTO> getJukeboxes(AccountDTO dto) {
 		ArrayList<JukeboxDTO> retList = new ArrayList<JukeboxDTO>();
-		if (acc != null) {
+		if (dto != null) {
 			for (Jukebox jbItem : jukeboxRepo.getList()) {
-				if (jbItem.getAccountRoles().containsKey(
-						modelMapper.map(acc, Account.class)))
-					retList.add(modelMapper.map(jbItem, JukeboxDTO.class));
+				Account acc = modelMapper.map(dto, Account.class);
+				if (jbItem.getAccountRoles().containsKey(acc))
+				{
+					Role role = jbItem.getAccountRoles().get(acc);
+					if(role.equals(Role.Administrator) || role.equals(Role.Manager))
+						retList.add(modelMapper.map(jbItem, JukeboxDTO.class));
+				}
 			}
 		}
 		return retList;
 	}
 
 	public PlaylistDTO getMandatoryPlaylistDTO() {
-		if (currentJukebox.getMandatoryPlaylist() == null) {
-			Playlist cpl = new Playlist("Mandatory");
-			currentJukebox.setMandatoryPlaylist(cpl);
+		if (currentJukebox != null) {
+			if (currentJukebox.getMandatoryPlaylist() == null) {
+				Playlist cpl = new Playlist("Mandatory");
+				currentJukebox.setMandatoryPlaylist(cpl);
+			}
+			return modelMapper.map(currentJukebox.getMandatoryPlaylist(),
+					PlaylistDTO.class);
 		}
-		return modelMapper.map(currentJukebox.getMandatoryPlaylist(),
-				PlaylistDTO.class);
+		return null;
 	}
 
 	public SongDTO getNextSong() {
@@ -350,8 +361,7 @@ public class JukeboxManager extends Observable {
 	}
 
 	public void setCurrentPlaylist(PlaylistDTO playlistDTO) {
-		if (currentJukebox == null)
-		{
+		if (currentJukebox == null) {
 			Account acc = new Account();
 			acc = accountRepo.save(acc);
 			currentJukebox = new Jukebox("Unsaved Jukebox", acc);
@@ -362,7 +372,7 @@ public class JukeboxManager extends Observable {
 		pl = playlistRepo.find(pl);
 		pl = playlistRepo.save(pl);
 		Playlist copy = copyPlaylist(pl);
-		copy = playlistRepo.save(copy);	
+		copy = playlistRepo.save(copy);
 		currentJukebox.setCurrentPlaylist(copy);
 		currentJukebox = jukeboxRepo.save(currentJukebox);
 		setChanged();
@@ -433,7 +443,8 @@ public class JukeboxManager extends Observable {
 
 	public AccountDTO getAccount(String serviceName, String serviceId) {
 		for (Account acc : accountRepo.getList()) {
-			if(acc.getServiceName().equals(serviceName)&& acc.getServiceId().equals(serviceId))
+			if (acc.getServiceName().equals(serviceName)
+					&& acc.getServiceId().equals(serviceId))
 				return modelMapper.map(acc, AccountDTO.class);
 		}
 		return null;
