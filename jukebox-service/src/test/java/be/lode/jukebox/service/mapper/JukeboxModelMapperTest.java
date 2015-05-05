@@ -17,6 +17,7 @@ import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.OAuthApiInfoDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
 import be.lode.jukebox.service.dto.SongDTO;
+import be.lode.setup.ResetDBSetupLiveData;
 import be.lode.setup.ResetDBSetupTestData;
 
 public class JukeboxModelMapperTest {
@@ -27,7 +28,7 @@ public class JukeboxModelMapperTest {
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		ResetDBSetupTestData.run();
+		ResetDBSetupLiveData.run();
 	}
 
 	private JukeboxModelMapper modelMapper;
@@ -139,10 +140,11 @@ public class JukeboxModelMapperTest {
 		assertEquals(oDTO.getId(), String.valueOf(o.getId()));
 		assertEquals(oDTO.getName(), o.getName());
 	}
-	
+
 	@Test
 	public void mapSongToDTO() {
-		Song o = new Song("artistmapSongToDTO", "titlemapSongToDTO", "pathmapSongToDTO");
+		Song o = new Song("artistmapSongToDTO", "titlemapSongToDTO",
+				"pathmapSongToDTO");
 		o.setId(17);
 
 		SongDTO oDTO = modelMapper.map(o, SongDTO.class);

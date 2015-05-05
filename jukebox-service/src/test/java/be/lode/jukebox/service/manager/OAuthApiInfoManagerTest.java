@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import be.lode.jukebox.service.dto.OAuthApiInfoDTO;
+import be.lode.setup.ResetDBSetupLiveData;
 import be.lode.setup.ResetDBSetupTestData;
 
 public class OAuthApiInfoManagerTest {
@@ -18,7 +19,7 @@ public class OAuthApiInfoManagerTest {
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		ResetDBSetupTestData.run();
+		ResetDBSetupLiveData.run();
 	}
 
 	private OAuthApiInfoManager mgr;

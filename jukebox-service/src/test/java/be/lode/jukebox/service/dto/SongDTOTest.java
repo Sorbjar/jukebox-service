@@ -4,10 +4,23 @@ import static org.junit.Assert.assertEquals;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SongDTOTest {
+import be.lode.setup.ResetDBSetupLiveData;
+import be.lode.setup.ResetDBSetupTestData;
 
+public class SongDTOTest {
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		ResetDBSetupTestData.run();
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		ResetDBSetupLiveData.run();
+	}
 	@Test
 	public void testEquals() {
 		EqualsVerifier.forClass(SongDTO.class).usingGetClass()

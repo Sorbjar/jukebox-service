@@ -29,6 +29,7 @@ import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
 import be.lode.jukebox.service.dto.SongDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
+import be.lode.setup.ResetDBSetupLiveData;
 import be.lode.setup.ResetDBSetupTestData;
 
 public class JukeboxManagerTest {
@@ -39,7 +40,7 @@ public class JukeboxManagerTest {
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		ResetDBSetupTestData.run();
+		ResetDBSetupLiveData.run();
 	}
 
 	private JukeboxModelMapper mapper;
@@ -310,9 +311,9 @@ public class JukeboxManagerTest {
 		SongDTO dto2 = mapper.map(s2, SongDTO.class);
 		dto2.setPlayListOrder("0");
 
-		SongDTO test =  mgr.getNextSong();
-		assertEquals(dto2.getArtist(),test.getArtist());
-		assertEquals(dto2.getTitle(),test.getTitle());
+		SongDTO test = mgr.getNextSong();
+		assertEquals(dto2.getArtist(), test.getArtist());
+		assertEquals(dto2.getTitle(), test.getTitle());
 
 		o.getMandatoryPlaylist().addSong(s4);
 
@@ -328,8 +329,9 @@ public class JukeboxManagerTest {
 
 	@Test
 	public void testGetPreviousSong() {
-		Account acc = new Account("testGetPreviousSonga", "testGetPreviousSongb",
-				"testGetPreviousSongc", "testGetPreviousSongd", "testGetPreviousSonge");
+		Account acc = new Account("testGetPreviousSonga",
+				"testGetPreviousSongb", "testGetPreviousSongc",
+				"testGetPreviousSongd", "testGetPreviousSonge");
 
 		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
 		acc = aRepo.save(acc);
@@ -572,7 +574,7 @@ public class JukeboxManagerTest {
 		}
 
 	}
-	
+
 	@Test
 	public void testSetCurrentSong() {
 		Repository<Song> sRepo = new SongRepository(mgr.getEmf());
