@@ -9,6 +9,8 @@
 		<class>be.lode.jukebox.business.model.OAuthApiInfo</class>
 		<class>be.lode.jukebox.business.model.Song</class>
 		<class>be.lode.jukebox.business.model.Playlist</class>
+		<class>be.lode.jukebox.business.model.PayPalSettings</class>
+		<class>be.lode.jukebox.business.model.Currency</class>
 		<properties>
 			<property name="hibernate.archive.autodetection" value="class" />
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
