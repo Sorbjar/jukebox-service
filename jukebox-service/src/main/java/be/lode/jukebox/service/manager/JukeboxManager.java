@@ -1,5 +1,7 @@
 package be.lode.jukebox.service.manager;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,7 @@ import javax.persistence.Persistence;
 
 import be.lode.general.repository.Repository;
 import be.lode.jukebox.business.model.Account;
+import be.lode.jukebox.business.model.Currency;
 import be.lode.jukebox.business.model.Jukebox;
 import be.lode.jukebox.business.model.Playlist;
 import be.lode.jukebox.business.model.Song;
@@ -23,7 +26,9 @@ import be.lode.jukebox.business.repo.PlaylistRepository;
 import be.lode.jukebox.business.repo.SongRepository;
 import be.lode.jukebox.service.UpdateArgs;
 import be.lode.jukebox.service.dto.AccountDTO;
+import be.lode.jukebox.service.dto.CurrencyDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
+import be.lode.jukebox.service.dto.PayPalSettingsDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
 import be.lode.jukebox.service.dto.SongDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
@@ -37,14 +42,25 @@ public class JukeboxManager extends Observable {
 	private int currentSongInt;
 	private EntityManagerFactory emf;
 	private Repository<Jukebox> jukeboxRepo;
+	private boolean mandatory;
 	private JukeboxModelMapper modelMapper;
 	private Repository<Playlist> playlistRepo;
 	private Repository<Song> songRepo;
-	private boolean mandatory;
 
 	public JukeboxManager() {
 		super();
-		emf = Persistence.createEntityManagerFactory("jukebox-business");
+		this.emf = Persistence.createEntityManagerFactory("jukebox-business");
+		accountRepo = new AccountRepository(emf);
+		jukeboxRepo = new JukeboxRepository(emf);
+		playlistRepo = new PlaylistRepository(emf);
+		songRepo = new SongRepository(emf);
+		modelMapper = new JukeboxModelMapper();
+		mandatory = false;
+	}
+
+	public JukeboxManager(EntityManagerFactory emf) {
+		super();
+		this.emf = emf;
 		accountRepo = new AccountRepository(emf);
 		jukeboxRepo = new JukeboxRepository(emf);
 		playlistRepo = new PlaylistRepository(emf);
@@ -124,6 +140,15 @@ public class JukeboxManager extends Observable {
 		return findAccountFromList(loggedInAccount);
 	}
 
+	public AccountDTO getAccount(String serviceName, String serviceId) {
+		for (Account acc : accountRepo.getList()) {
+			if (acc.getServiceName().equals(serviceName)
+					&& acc.getServiceId().equals(serviceId))
+				return modelMapper.map(acc, AccountDTO.class);
+		}
+		return null;
+	}
+
 	public List<SongDTO> getAllSongs() {
 		List<SongDTO> ret = new ArrayList<SongDTO>();
 		for (Song s : songRepo.getList()) {
@@ -169,10 +194,10 @@ public class JukeboxManager extends Observable {
 		if (dto != null) {
 			for (Jukebox jbItem : jukeboxRepo.getList()) {
 				Account acc = modelMapper.map(dto, Account.class);
-				if (jbItem.getAccountRoles().containsKey(acc))
-				{
+				if (jbItem.getAccountRoles().containsKey(acc)) {
 					Role role = jbItem.getAccountRoles().get(acc);
-					if(role.equals(Role.Administrator) || role.equals(Role.Manager))
+					if (role.equals(Role.Administrator)
+							|| role.equals(Role.Manager))
 						retList.add(modelMapper.map(jbItem, JukeboxDTO.class));
 				}
 			}
@@ -206,13 +231,6 @@ public class JukeboxManager extends Observable {
 			}
 		}
 		return null;
-	}
-
-	private void removeCurrentSongFromMandatoryPlaylist() {
-		if (currentJukebox != null && mandatory) {
-			currentJukebox.removeMandatorySong(currentSong, currentSongInt);
-		}
-
 	}
 
 	public SongDTO getPreviousSong() {
@@ -276,6 +294,10 @@ public class JukeboxManager extends Observable {
 		if (currentJukebox != null)
 			return currentJukebox.isLooped();
 		return false;
+	}
+
+	public boolean isMandatory() {
+		return mandatory;
 	}
 
 	public boolean isRandom() {
@@ -426,6 +448,13 @@ public class JukeboxManager extends Observable {
 		return modelMapper.map(accountRepo.save(acc), AccountDTO.class);
 	}
 
+	private void removeCurrentSongFromMandatoryPlaylist() {
+		if (currentJukebox != null && mandatory) {
+			currentJukebox.removeMandatorySong(currentSong, currentSongInt);
+		}
+
+	}
+
 	private Jukebox updateEditedFields(Jukebox jb, JukeboxDTO dto) {
 		Jukebox newFields = modelMapper.map(dto, Jukebox.class);
 		if (jb != null) {
@@ -437,16 +466,35 @@ public class JukeboxManager extends Observable {
 		return newFields;
 	}
 
-	public boolean isMandatory() {
-		return mandatory;
+	// TODO 010 testing
+	public PayPalSettingsDTO getCurrentPayPalSettingsDTO() {
+		if (currentJukebox != null)
+			return modelMapper.map(currentJukebox.getPayPalSettings(),
+					PayPalSettingsDTO.class);
+		return null;
 	}
 
-	public AccountDTO getAccount(String serviceName, String serviceId) {
-		for (Account acc : accountRepo.getList()) {
-			if (acc.getServiceName().equals(serviceName)
-					&& acc.getServiceId().equals(serviceId))
-				return modelMapper.map(acc, AccountDTO.class);
-		}
-		return null;
+	// TODO 010 testing
+	public void editJukebox(String name, String paymentEmail,
+			CurrencyDTO currencyDTO, String pricePerSong) {
+		currentJukebox.setName(name);
+		currentJukebox.getPayPalSettings().setCurrency(
+				modelMapper.map(currencyDTO, Currency.class));
+
+		currentJukebox.getPayPalSettings().setPricePerSong(
+				round(Double.parseDouble(pricePerSong), 2));
+		currentJukebox.getPayPalSettings().setEmail(paymentEmail);
+		currentJukebox = jukeboxRepo.save(currentJukebox);
+
+	}
+
+	// TODO 010 testing
+	public double round(double value, int places) {
+		if (places < 0)
+			throw new IllegalArgumentException();
+
+		BigDecimal bd = new BigDecimal(value);
+		bd = bd.setScale(places, RoundingMode.HALF_UP);
+		return bd.doubleValue();
 	}
 }
