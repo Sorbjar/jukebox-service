@@ -17,6 +17,19 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>net.glxn.qrgen</groupId>
+			<artifactId>javase</artifactId>
+			<version>2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.glxn</groupId>
+			<artifactId>qrgen</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+
+		<dependency>
 			<groupId>be.lode.jukebox</groupId>
 			<artifactId>jukebox-business</artifactId>
 			<version>0.0.1-SNAPSHOT</version>

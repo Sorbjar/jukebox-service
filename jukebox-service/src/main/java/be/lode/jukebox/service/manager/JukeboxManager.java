@@ -2,6 +2,8 @@ package be.lode.jukebox.service.manager;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +33,11 @@ import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.PayPalSettingsDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
 import be.lode.jukebox.service.dto.SongDTO;
+import be.lode.jukebox.service.image.QRStream;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 import be.lode.oauth.OAuthButton.IOAuthUser;
+
+import com.vaadin.server.StreamResource.StreamSource;
 
 //TODO 700 manager uit elkaar halen
 public class JukeboxManager extends Observable {
@@ -496,5 +501,16 @@ public class JukeboxManager extends Observable {
 		BigDecimal bd = new BigDecimal(value);
 		bd = bd.setScale(places, RoundingMode.HALF_UP);
 		return bd.doubleValue();
+	}
+
+	public StreamSource getQRImage() {
+		try {
+			return new QRStream("http://"
+					+ InetAddress.getLocalHost().getHostAddress()
+					+ "/registercustomer?jukeboxid="
+					+ String.valueOf(currentJukebox.getId()));
+		} catch (UnknownHostException e) {
+			return null;
+		}
 	}
 }
