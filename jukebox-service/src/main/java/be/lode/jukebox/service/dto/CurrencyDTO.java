@@ -1,6 +1,5 @@
 package be.lode.jukebox.service.dto;
 
-//TODO 010 testing
 public class CurrencyDTO {
 	private String name;
 	private String payPalCode;

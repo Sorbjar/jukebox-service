@@ -471,7 +471,6 @@ public class JukeboxManager extends Observable {
 		return newFields;
 	}
 
-	// TODO 010 testing
 	public PayPalSettingsDTO getCurrentPayPalSettingsDTO() {
 		if (currentJukebox != null)
 			return modelMapper.map(currentJukebox.getPayPalSettings(),

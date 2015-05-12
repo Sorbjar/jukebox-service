@@ -36,10 +36,4 @@ public class OAuthApiInfoManagerTest {
 				o.getApiKey());
 		assertEquals("getName Expecting Facebook", "Facebook", o.getName());
 	}
-
-	@Test
-	public void testOAuthApiInfoManager() {
-		// no test
-	}
-
 }

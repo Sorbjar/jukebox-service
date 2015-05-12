@@ -16,16 +16,20 @@ import org.junit.Test;
 
 import be.lode.general.repository.Repository;
 import be.lode.jukebox.business.model.Account;
+import be.lode.jukebox.business.model.Currency;
 import be.lode.jukebox.business.model.Jukebox;
+import be.lode.jukebox.business.model.PayPalSettings;
 import be.lode.jukebox.business.model.Playlist;
 import be.lode.jukebox.business.model.Song;
 import be.lode.jukebox.business.model.enums.Role;
 import be.lode.jukebox.business.repo.AccountRepository;
 import be.lode.jukebox.business.repo.JukeboxRepository;
+import be.lode.jukebox.business.repo.PayPalSettingsRepository;
 import be.lode.jukebox.business.repo.PlaylistRepository;
 import be.lode.jukebox.business.repo.SongRepository;
 import be.lode.jukebox.service.dto.AccountDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
+import be.lode.jukebox.service.dto.PayPalSettingsDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
 import be.lode.jukebox.service.dto.SongDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
@@ -590,5 +594,30 @@ public class JukeboxManagerTest {
 				assertEquals(sDTO, mgr.getCurrentSongDTO());
 			}
 		}
+	}
+	
+	@Test
+	public void testGetCurrentPayPalSettingsDTO()
+	{
+
+		Repository<PayPalSettings> pRepo = new PayPalSettingsRepository(mgr.getEmf());
+		PayPalSettings pps = new PayPalSettings();
+		pps.setCurrency(new Currency("PLN","Polish Zloty"));
+		pps.setEmail("newEm@email.com");
+		pps.setPricePerSong(1.24);
+		pps = pRepo.save(pps);
+
+		Account acc = new Account("emad@test.be","fn","ln","1586","facebook");
+		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
+		acc = aRepo.save(acc);
+		Jukebox o = new Jukebox("testGetCurrentPayPalSettingsDTO", acc);
+		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
+		o = jRepo.save(o);
+		o.setPayPalSettings(pps);
+
+		o = jRepo.save(o);
+	
+		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
+		assertEquals(mapper.map(pps, PayPalSettingsDTO.class), mgr.getCurrentPayPalSettingsDTO());
 	}
 }

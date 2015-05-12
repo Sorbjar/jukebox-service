@@ -12,7 +12,6 @@ import be.lode.jukebox.business.repo.CurrencyRepository;
 import be.lode.jukebox.service.dto.CurrencyDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 
-//TODO 010 testing
 public class CurrencyManager {
 	private EntityManagerFactory emf;
 	private Repository<Currency> currencyRepo;
@@ -44,7 +43,6 @@ public class CurrencyManager {
 		return retList;
 	}
 
-	// TODO 010 testing
 	public CurrencyDTO getCurrency(String payPalCurrencyCode) {
 		Currency cur = new Currency(payPalCurrencyCode,"");
 		cur = currencyRepo.findEquals(cur);
