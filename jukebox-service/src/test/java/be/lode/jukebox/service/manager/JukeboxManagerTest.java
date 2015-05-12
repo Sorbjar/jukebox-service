@@ -28,6 +28,7 @@ import be.lode.jukebox.business.repo.PayPalSettingsRepository;
 import be.lode.jukebox.business.repo.PlaylistRepository;
 import be.lode.jukebox.business.repo.SongRepository;
 import be.lode.jukebox.service.dto.AccountDTO;
+import be.lode.jukebox.service.dto.CurrencyDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.PayPalSettingsDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
@@ -48,8 +49,8 @@ public class JukeboxManagerTest {
 	}
 
 	private JukeboxModelMapper mapper;
-
 	private JukeboxManager mgr;
+	private static final double DELTA = 1e-15;
 
 	@Before
 	public void setUp() throws Exception {
@@ -595,19 +596,20 @@ public class JukeboxManagerTest {
 			}
 		}
 	}
-	
-	@Test
-	public void testGetCurrentPayPalSettingsDTO()
-	{
 
-		Repository<PayPalSettings> pRepo = new PayPalSettingsRepository(mgr.getEmf());
+	@Test
+	public void testGetCurrentPayPalSettingsDTO() {
+
+		Repository<PayPalSettings> pRepo = new PayPalSettingsRepository(
+				mgr.getEmf());
 		PayPalSettings pps = new PayPalSettings();
-		pps.setCurrency(new Currency("PLN","Polish Zloty"));
+		pps.setCurrency(new Currency("PLN", "Polish Zloty"));
 		pps.setEmail("newEm@email.com");
 		pps.setPricePerSong(1.24);
 		pps = pRepo.save(pps);
 
-		Account acc = new Account("emad@test.be","fn","ln","1586","facebook");
+		Account acc = new Account("emad@test.be", "fn", "ln", "1586",
+				"facebook");
 		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
 		acc = aRepo.save(acc);
 		Jukebox o = new Jukebox("testGetCurrentPayPalSettingsDTO", acc);
@@ -616,8 +618,44 @@ public class JukeboxManagerTest {
 		o.setPayPalSettings(pps);
 
 		o = jRepo.save(o);
-	
+
 		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
-		assertEquals(mapper.map(pps, PayPalSettingsDTO.class), mgr.getCurrentPayPalSettingsDTO());
+		assertEquals(mapper.map(pps, PayPalSettingsDTO.class),
+				mgr.getCurrentPayPalSettingsDTO());
+	}
+
+	@Test
+	public void testEditJukebox() {
+		Repository<PayPalSettings> pRepo = new PayPalSettingsRepository(
+				mgr.getEmf());
+		PayPalSettings pps = new PayPalSettings();
+		pps.setCurrency(new Currency("PLN", "Polish Zloty"));
+		pps.setEmail("newEm@email.com");
+		pps.setPricePerSong(1.24);
+		pps = pRepo.save(pps);
+
+		Account acc = new Account("emad@test.be", "fn", "ln", "1586",
+				"facebook");
+		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
+		acc = aRepo.save(acc);
+		Jukebox o = new Jukebox("testEditJukebox", acc);
+		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
+		o = jRepo.save(o);
+		o.setPayPalSettings(pps);
+
+		o = jRepo.save(o);
+		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
+		assertEquals("testEditJukebox", o.getName());
+		mgr.editJukebox("newName", "lol@lol.lol", mapper.map(new Currency(
+				"BFR", "Belgian Frank"), CurrencyDTO.class), "1.3");
+
+		assertEquals("newName", mgr.getCurrentJukeboxDTO().getName());
+	}
+
+	@Test
+	public void testRound() {
+		assertEquals("round up", 1.18, mgr.round(1.176, 2), DELTA);
+		assertEquals("round down", 1.17, mgr.round(1.173, 2), DELTA);
+
 	}
 }

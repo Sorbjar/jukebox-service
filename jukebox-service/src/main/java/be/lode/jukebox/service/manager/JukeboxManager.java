@@ -478,7 +478,6 @@ public class JukeboxManager extends Observable {
 		return null;
 	}
 
-	// TODO 010 testing
 	public void editJukebox(String name, String paymentEmail,
 			CurrencyDTO currencyDTO, String pricePerSong) {
 		currentJukebox.setName(name);
@@ -492,7 +491,7 @@ public class JukeboxManager extends Observable {
 
 	}
 
-	// TODO 010 testing
+	
 	public double round(double value, int places) {
 		if (places < 0)
 			throw new IllegalArgumentException();

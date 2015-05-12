@@ -8,7 +8,6 @@ import be.lode.jukebox.service.dto.JukeboxPaymentWSDTO;
 public class JukeboxPaymentWSDTOMap extends
 		PropertyMap<Jukebox, JukeboxPaymentWSDTO> {
 
-	// TODO 010 testing
 	@Override
 	protected void configure() {
 		map().setId(String.valueOf(source.getId()));

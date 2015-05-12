@@ -1,6 +1,5 @@
 package be.lode.jukebox.service.dto;
 
-//TODO 010 testing
 public class PayPalSettingsDTO {
 	private String currencyName;
 	private String email;
@@ -17,8 +16,6 @@ public class PayPalSettingsDTO {
 		this.pricePerSong = "";
 	}
 
-	
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -26,8 +23,6 @@ public class PayPalSettingsDTO {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
-
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -45,8 +40,6 @@ public class PayPalSettingsDTO {
 			return false;
 		return true;
 	}
-
-
 
 	public String getCurrencyName() {
 		return currencyName;
