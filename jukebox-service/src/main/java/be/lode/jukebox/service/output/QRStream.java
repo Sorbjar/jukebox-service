@@ -1,4 +1,4 @@
-package be.lode.jukebox.service.image;
+package be.lode.jukebox.service.output;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,7 +13,11 @@ public class QRStream implements StreamSource {
 	private ByteArrayOutputStream stream;
 
 	public QRStream(String input) {
-		stream = QRCode.from(input).withSize(200, 200).stream();
+		stream = QRCode.from(input).stream();
+	}
+	
+	public QRStream(String input, int width, int height) {
+		stream = QRCode.from(input).withSize(width, height).stream();
 	}
 
 	@Override

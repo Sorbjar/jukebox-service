@@ -33,8 +33,8 @@ import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.PayPalSettingsDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
 import be.lode.jukebox.service.dto.SongDTO;
-import be.lode.jukebox.service.image.QRStream;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
+import be.lode.jukebox.service.output.QRStream;
 import be.lode.oauth.OAuthButton.IOAuthUser;
 
 import com.vaadin.server.StreamResource.StreamSource;
@@ -491,7 +491,6 @@ public class JukeboxManager extends Observable {
 
 	}
 
-	
 	public double round(double value, int places) {
 		if (places < 0)
 			throw new IllegalArgumentException();
@@ -510,5 +509,31 @@ public class JukeboxManager extends Observable {
 		} catch (UnknownHostException e) {
 			return null;
 		}
+	}
+
+	public StreamSource getQRImage(int width, int height) {
+		try {
+			return new QRStream("http://"
+					+ InetAddress.getLocalHost().getHostAddress()
+					+ "/registercustomer?jukeboxid="
+					+ String.valueOf(currentJukebox.getId()), width, height);
+		} catch (UnknownHostException e) {
+			return null;
+		}
+	}
+
+	public SongDTO getFirstSong() {
+		if (currentJukebox != null) {
+			SongContainer sc = currentJukebox.getFirstSong();
+			if (sc != null) {
+				SongDTO dto = modelMapper.map(sc.getSong(), SongDTO.class);
+				currentSongInt = sc.getPlaylistOrder();
+				mandatory = sc.getMandatory();
+				dto.setPlayListOrder(String.valueOf(currentSongInt));
+				setCurrentSong(dto);
+				return dto;
+			}
+		}
+		return null;
 	}
 }

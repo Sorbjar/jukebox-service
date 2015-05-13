@@ -658,4 +658,77 @@ public class JukeboxManagerTest {
 		assertEquals("round down", 1.17, mgr.round(1.173, 2), DELTA);
 
 	}
+
+	@Test
+	public void testGetFirstSong() {
+		Account acc = new Account("testGetFirstSonga", "testGetFirstSongb",
+				"testGetFirstSongc", "testGetFirstSongd", "testGetFirstSonge");
+
+		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
+		acc = aRepo.save(acc);
+		Jukebox o = new Jukebox("testGetFirstSong", acc);
+
+		String artist = "s1" + "artist";
+		String title = "s1" + "title";
+		String path = "s1" + "path";
+
+		Song s1 = new Song(artist, title, path);
+
+		artist = "s2" + "artist";
+		title = "s2" + "title";
+		path = "s2" + "path";
+
+		Song s2 = new Song(artist, title, path);
+
+		artist = "s3" + "artist";
+		title = "s3" + "title";
+		path = "s3" + "path";
+
+		Song s3 = new Song(artist, title, path);
+
+		Repository<Song> sRepo = new SongRepository(mgr.getEmf());
+		s1 = sRepo.save(s1);
+		s2 = sRepo.save(s2);
+		s3 = sRepo.save(s3);
+
+		o.getCurrentPlaylist().addSong(s1);
+		o.getCurrentPlaylist().addSong(s2);
+		o.getCurrentPlaylist().addSong(s3);
+
+		artist = "s4" + "artist";
+		title = "s4" + "title";
+		path = "s4" + "path";
+
+		Song s4 = new Song(artist, title, path);
+
+		s4 = sRepo.save(s4);
+		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
+
+		o = jRepo.save(o);
+		JukeboxModelMapper mapper = new JukeboxModelMapper();
+		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
+
+		mgr.setCurrentSong(mapper.map(s1, SongDTO.class));
+
+		SongDTO dto1 = mapper.map(s1, SongDTO.class);
+		dto1.setPlayListOrder("0");
+		
+		SongDTO dto2 = mapper.map(s2, SongDTO.class);
+		dto2.setPlayListOrder("1");
+
+		SongDTO test = mgr.getFirstSong();
+		assertEquals(dto1.getArtist(), test.getArtist());
+		assertEquals(dto1.getTitle(), test.getTitle());
+
+		o.getMandatoryPlaylist().addSong(s4);
+
+		o = jRepo.save(o);
+		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
+		mgr.setCurrentSong(mapper.map(s1, SongDTO.class));
+
+		SongDTO dto4 = mapper.map(s4, SongDTO.class);
+		dto4.setPlayListOrder("0");
+
+		assertEquals(dto4, mgr.getFirstSong());
+	}
 }
