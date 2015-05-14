@@ -1,27 +1,53 @@
 package be.lode.jukebox.service.dto;
 
 public class SongDTO {
-	// TODO 400 other fields
+	private String album;
+	private String albumArtist;
 	private String artist;
+	private String audioChannelType;
+	private String audioCompressor;
+	private String author;
+	private String channels;
+	private String composer;
+	private String contentType;
+	private String creator;
+	private String discNumber;
+	private String duration;
+	private String genre;
 	private String id;
+	private String mandatory;
 	private String path;
 	private String playListOrder;
+	private String releaseDate;
+	private String samplerate;
 	private String title;
-	private String mandatory;
-
-	public String getMandatory() {
-		return mandatory;
-	}
-
-	public void setMandatory(String mandatory) {
-		this.mandatory = mandatory;
-	}
+	private String trackNumber;
+	private String version;
 
 	public SongDTO() {
 		super();
+		this.album = "";
+		this.albumArtist = "";
 		this.artist = "";
-		this.title = "";
+		this.audioChannelType = "";
+		this.audioCompressor = "";
+		this.author = "";
+		this.channels = "";
+		this.composer = "";
+		this.contentType = "";
+		this.creator = "";
+		this.discNumber = "";
+		this.duration = "";
+		this.genre = "";
+		this.id = "";
+		this.mandatory = "";
+		this.path = "";
 		this.playListOrder = "";
+		this.releaseDate = "";
+		this.samplerate = "";
+		this.title = "";
+		this.trackNumber = "";
+		this.version = "";
 		this.mandatory = String.valueOf(false);
 	}
 
@@ -52,12 +78,64 @@ public class SongDTO {
 		return true;
 	}
 
+	public String getAlbum() {
+		return album;
+	}
+
+	public String getAlbumArtist() {
+		return albumArtist;
+	}
+
 	public String getArtist() {
 		return artist;
 	}
 
+	public String getAudioChannelType() {
+		return audioChannelType;
+	}
+
+	public String getAudioCompressor() {
+		return audioCompressor;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public String getChannels() {
+		return channels;
+	}
+
+	public String getComposer() {
+		return composer;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public String getCreator() {
+		return creator;
+	}
+
+	public String getDiscNumber() {
+		return discNumber;
+	}
+
+	public String getDuration() {
+		return duration;
+	}
+
+	public String getGenre() {
+		return genre;
+	}
+
 	public String getId() {
 		return id;
+	}
+
+	public String getMandatory() {
+		return mandatory;
 	}
 
 	public String getPath() {
@@ -68,8 +146,24 @@ public class SongDTO {
 		return playListOrder;
 	}
 
+	public String getReleaseDate() {
+		return releaseDate;
+	}
+
+	public String getSamplerate() {
+		return samplerate;
+	}
+
 	public String getTitle() {
 		return title;
+	}
+
+	public String getTrackNumber() {
+		return trackNumber;
+	}
+
+	public String getVersion() {
+		return version;
 	}
 
 	@Override
@@ -83,12 +177,64 @@ public class SongDTO {
 		return result;
 	}
 
+	public void setAlbum(String album) {
+		this.album = album;
+	}
+
+	public void setAlbumArtist(String albumArtist) {
+		this.albumArtist = albumArtist;
+	}
+
 	public void setArtist(String artist) {
 		this.artist = artist;
 	}
 
+	public void setAudioChannelType(String audioChannelType) {
+		this.audioChannelType = audioChannelType;
+	}
+
+	public void setAudioCompressor(String audioCompressor) {
+		this.audioCompressor = audioCompressor;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	public void setChannels(String channels) {
+		this.channels = channels;
+	}
+
+	public void setComposer(String composer) {
+		this.composer = composer;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public void setCreator(String creator) {
+		this.creator = creator;
+	}
+
+	public void setDiscNumber(String discNumber) {
+		this.discNumber = discNumber;
+	}
+
+	public void setDuration(String duration) {
+		this.duration = duration;
+	}
+
+	public void setGenre(String genre) {
+		this.genre = genre;
+	}
+
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public void setMandatory(String mandatory) {
+		this.mandatory = mandatory;
 	}
 
 	public void setPath(String path) {
@@ -99,8 +245,24 @@ public class SongDTO {
 		this.playListOrder = playListOrder;
 	}
 
+	public void setReleaseDate(String releaseDate) {
+		this.releaseDate = releaseDate;
+	}
+
+	public void setSamplerate(String samplerate) {
+		this.samplerate = samplerate;
+	}
+
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public void setTrackNumber(String trackNumber) {
+		this.trackNumber = trackNumber;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 	@Override

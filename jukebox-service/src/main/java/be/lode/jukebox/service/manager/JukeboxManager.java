@@ -3,6 +3,7 @@ package be.lode.jukebox.service.manager;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,8 @@ import be.lode.jukebox.service.dto.PayPalSettingsDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
 import be.lode.jukebox.service.dto.SongDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
+import be.lode.jukebox.service.output.PDFStream;
+import be.lode.jukebox.service.output.QR;
 import be.lode.jukebox.service.output.QRStream;
 import be.lode.oauth.OAuthButton.IOAuthUser;
 
@@ -511,7 +514,7 @@ public class JukeboxManager extends Observable {
 		}
 	}
 
-	public StreamSource getQRImage(int width, int height) {
+	public StreamSource getQRStream(int width, int height) {
 		try {
 			return new QRStream("http://"
 					+ InetAddress.getLocalHost().getHostAddress()
@@ -535,5 +538,21 @@ public class JukeboxManager extends Observable {
 			}
 		}
 		return null;
+	}
+
+	public StreamSource getPDFStream() {
+		try {
+			PDFStream pdf = new PDFStream(QR
+					.getQRFile(
+							"http://"
+									+ InetAddress.getLocalHost()
+											.getHostAddress()
+									+ "/registercustomer?jukeboxid="
+									+ String.valueOf(currentJukebox.getId()),
+							450, 450).toURI().toURL());
+			return pdf;
+		} catch (UnknownHostException | MalformedURLException e) {
+			return null;
+		}
 	}
 }
