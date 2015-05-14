@@ -13,6 +13,7 @@ import be.lode.jukebox.service.mapper.maps.JukeboxPaymentWSDTOMap;
 import be.lode.jukebox.service.mapper.maps.OAuthApiInfoMap;
 import be.lode.jukebox.service.mapper.maps.OAuthUserMap;
 import be.lode.jukebox.service.mapper.maps.PayPalSettingsMap;
+import be.lode.jukebox.service.mapper.maps.SongMap;
 import be.lode.jukebox.service.mapper.providers.CurrencyProvider;
 import be.lode.jukebox.service.mapper.providers.PayPalSettingsProvider;
 import be.lode.jukebox.service.mapper.providers.SongProvider;
@@ -31,6 +32,7 @@ public class JukeboxModelMapper extends ModelMapper {
 		this.addMappings(new AccountMap());
 		this.addMappings(new JukeboxPaymentWSDTOMap());
 		this.addMappings(new PayPalSettingsMap());
+		this.addMappings(new SongMap());
 	}
 
 	private void createTypeMaps() {

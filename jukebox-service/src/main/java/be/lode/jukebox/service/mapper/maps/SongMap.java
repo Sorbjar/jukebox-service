@@ -39,7 +39,7 @@ public class SongMap extends PropertyMap<Song, SongDTO> {
 	}
 
 	private String getMetaData(String string) {
-		if (source.getMetadataProperties().containsKey(string))
+		if (source.getMetadataProperties() != null && source.getMetadataProperties().containsKey(string))
 			return source.getMetadataProperties().get(string);
 		return "";
 	}
