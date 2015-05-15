@@ -144,6 +144,19 @@ public class JukeboxManager extends Observable {
 
 	}
 
+	public void editJukebox(String name, String paymentEmail,
+			CurrencyDTO currencyDTO, String pricePerSong) {
+		currentJukebox.setName(name);
+		currentJukebox.getPayPalSettings().setCurrency(
+				modelMapper.map(currencyDTO, Currency.class));
+
+		currentJukebox.getPayPalSettings().setPricePerSong(
+				round(Double.parseDouble(pricePerSong), 2));
+		currentJukebox.getPayPalSettings().setEmail(paymentEmail);
+		currentJukebox = jukeboxRepo.save(currentJukebox);
+
+	}
+
 	public AccountDTO getAccount(AccountDTO loggedInAccount) {
 		return findAccountFromList(loggedInAccount);
 	}
@@ -171,6 +184,13 @@ public class JukeboxManager extends Observable {
 		return null;
 	}
 
+	public PayPalSettingsDTO getCurrentPayPalSettingsDTO() {
+		if (currentJukebox != null)
+			return modelMapper.map(currentJukebox.getPayPalSettings(),
+					PayPalSettingsDTO.class);
+		return null;
+	}
+
 	public PlaylistDTO getCurrentPlaylistDTO() {
 		if (currentJukebox != null) {
 			if (currentJukebox.getCurrentPlaylist() == null) {
@@ -195,6 +215,22 @@ public class JukeboxManager extends Observable {
 
 	public EntityManagerFactory getEmf() {
 		return emf;
+	}
+
+	public SongDTO getFirstSong() {
+		if (currentJukebox != null) {
+			SongContainer sc = currentJukebox.getFirstSong();
+			if (sc != null) {
+				SongDTO dto = modelMapper.map(sc.getSong(), SongDTO.class);
+				currentSongInt = sc.getPlaylistOrder();
+				mandatory = sc.getMandatory();
+				dto.setPlayListOrder(String.valueOf(currentSongInt));
+				dto.setMandatory(String.valueOf(sc.getMandatory()));
+				setCurrentSong(dto);
+				return dto;
+			}
+		}
+		return null;
 	}
 
 	public List<JukeboxDTO> getJukeboxes(AccountDTO dto) {
@@ -241,6 +277,22 @@ public class JukeboxManager extends Observable {
 		return null;
 	}
 
+	public StreamSource getPDFStream() {
+		try {
+			PDFStream pdf = new PDFStream(QR
+					.getQRFile(
+							"http://"
+									+ InetAddress.getLocalHost()
+											.getHostAddress()
+									+ "/registercustomer?jukeboxid="
+									+ String.valueOf(currentJukebox.getId()),
+							450, 450).toURI().toURL());
+			return pdf;
+		} catch (UnknownHostException | MalformedURLException e) {
+			return null;
+		}
+	}
+
 	public SongDTO getPreviousSong() {
 		if (currentJukebox != null) {
 			removeCurrentSongFromMandatoryPlaylist();
@@ -255,6 +307,28 @@ public class JukeboxManager extends Observable {
 			}
 		}
 		return null;
+	}
+
+	public StreamSource getQRImage() {
+		try {
+			return new QRStream("http://"
+					+ InetAddress.getLocalHost().getHostAddress()
+					+ "/registercustomer?jukeboxid="
+					+ String.valueOf(currentJukebox.getId()));
+		} catch (UnknownHostException e) {
+			return null;
+		}
+	}
+
+	public StreamSource getQRStream(int width, int height) {
+		try {
+			return new QRStream("http://"
+					+ InetAddress.getLocalHost().getHostAddress()
+					+ "/registercustomer?jukeboxid="
+					+ String.valueOf(currentJukebox.getId()), width, height);
+		} catch (UnknownHostException e) {
+			return null;
+		}
 	}
 
 	public List<PlaylistDTO> getSavedPlaylists(JukeboxDTO jukeboxDTO) {
@@ -285,9 +359,27 @@ public class JukeboxManager extends Observable {
 		return ret;
 	}
 
+	public List<SongDTO> getMandatorySongs() {
+		List<SongDTO> ret = new ArrayList<SongDTO>();
+		if (currentJukebox != null
+				&& currentJukebox.getMandatoryPlaylist() != null) {
+			Playlist pl = playlistRepo.find(currentJukebox
+					.getMandatoryPlaylist());
+			if (pl != null) {
+				for (Map.Entry<Integer, Song> entry : pl.getSongs().entrySet()) {
+					Song value = entry.getValue();
+					SongDTO dto = modelMapper.map(value, SongDTO.class);
+					dto.setPlayListOrder(entry.getKey().toString());
+					dto.setMandatory(String.valueOf(true));
+					ret.add(dto);
+				}
+			}
+		}
+
+		return ret;
+	}
+
 	public AccountDTO getUser(IOAuthUser user) {
-		// TODO 860 issue with modelmapper
-		// o = modelMapper.map( user, AccountDTO.class);
 		AccountDTO o = new AccountDTO();
 		o.setEmailAddress(user.getEmail());
 		o.setFirstName(user.getName());
@@ -341,6 +433,15 @@ public class JukeboxManager extends Observable {
 		setCurrentPlaylist(cpl);
 		setChanged();
 		notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
+	}
+
+	public double round(double value, int places) {
+		if (places < 0)
+			throw new IllegalArgumentException();
+
+		BigDecimal bd = new BigDecimal(value);
+		bd = bd.setScale(places, RoundingMode.HALF_UP);
+		return bd.doubleValue();
 	}
 
 	public AccountDTO save(AccountDTO dto) {
@@ -459,6 +560,9 @@ public class JukeboxManager extends Observable {
 	private void removeCurrentSongFromMandatoryPlaylist() {
 		if (currentJukebox != null && mandatory) {
 			currentJukebox.removeMandatorySong(currentSong, currentSongInt);
+			currentJukebox = jukeboxRepo.save(currentJukebox);
+			setChanged();
+			notifyObservers(UpdateArgs.CURRENT_PLAYLIST);
 		}
 
 	}
@@ -474,85 +578,11 @@ public class JukeboxManager extends Observable {
 		return newFields;
 	}
 
-	public PayPalSettingsDTO getCurrentPayPalSettingsDTO() {
-		if (currentJukebox != null)
-			return modelMapper.map(currentJukebox.getPayPalSettings(),
-					PayPalSettingsDTO.class);
-		return null;
-	}
-
-	public void editJukebox(String name, String paymentEmail,
-			CurrencyDTO currencyDTO, String pricePerSong) {
-		currentJukebox.setName(name);
-		currentJukebox.getPayPalSettings().setCurrency(
-				modelMapper.map(currencyDTO, Currency.class));
-
-		currentJukebox.getPayPalSettings().setPricePerSong(
-				round(Double.parseDouble(pricePerSong), 2));
-		currentJukebox.getPayPalSettings().setEmail(paymentEmail);
-		currentJukebox = jukeboxRepo.save(currentJukebox);
-
-	}
-
-	public double round(double value, int places) {
-		if (places < 0)
-			throw new IllegalArgumentException();
-
-		BigDecimal bd = new BigDecimal(value);
-		bd = bd.setScale(places, RoundingMode.HALF_UP);
-		return bd.doubleValue();
-	}
-
-	public StreamSource getQRImage() {
+	public boolean mandatoryEmpty() {
 		try {
-			return new QRStream("http://"
-					+ InetAddress.getLocalHost().getHostAddress()
-					+ "/registercustomer?jukeboxid="
-					+ String.valueOf(currentJukebox.getId()));
-		} catch (UnknownHostException e) {
-			return null;
-		}
-	}
-
-	public StreamSource getQRStream(int width, int height) {
-		try {
-			return new QRStream("http://"
-					+ InetAddress.getLocalHost().getHostAddress()
-					+ "/registercustomer?jukeboxid="
-					+ String.valueOf(currentJukebox.getId()), width, height);
-		} catch (UnknownHostException e) {
-			return null;
-		}
-	}
-
-	public SongDTO getFirstSong() {
-		if (currentJukebox != null) {
-			SongContainer sc = currentJukebox.getFirstSong();
-			if (sc != null) {
-				SongDTO dto = modelMapper.map(sc.getSong(), SongDTO.class);
-				currentSongInt = sc.getPlaylistOrder();
-				mandatory = sc.getMandatory();
-				dto.setPlayListOrder(String.valueOf(currentSongInt));
-				setCurrentSong(dto);
-				return dto;
-			}
-		}
-		return null;
-	}
-
-	public StreamSource getPDFStream() {
-		try {
-			PDFStream pdf = new PDFStream(QR
-					.getQRFile(
-							"http://"
-									+ InetAddress.getLocalHost()
-											.getHostAddress()
-									+ "/registercustomer?jukeboxid="
-									+ String.valueOf(currentJukebox.getId()),
-							450, 450).toURI().toURL());
-			return pdf;
-		} catch (UnknownHostException | MalformedURLException e) {
-			return null;
+			return currentJukebox.getMandatoryPlaylist().getSongs().size() <= 0;
+		} catch (NullPointerException ex) {
+			return true;
 		}
 	}
 }

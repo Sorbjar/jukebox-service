@@ -35,15 +35,45 @@ public class SongDTOProvider implements Provider<SongDTO> {
 		ret.setContentType(getMetaData("Content-Type"));
 		ret.setCreator(getMetaData("creator"));
 		ret.setDiscNumber(getMetaData("xmpDM:discNumber"));
-		//TODO 100 change format of duration
-		ret.setDuration(getMetaData("xmpDM:duration"));
+		ret.setDuration(duration(getMetaData("xmpDM:duration")));
 		ret.setGenre(getMetaData("xmpDM:genre"));
-		ret.setReleaseDate(getMetaData("xmpDM:releaseDate"));
+		ret.setReleaseDate(substring(getMetaData("xmpDM:releaseDate"), 0, 10));
 		ret.setSamplerate(getMetaData("samplerate"));
 		ret.setTrackNumber(getMetaData("xmpDM:trackNumber"));
 		ret.setVersion(getMetaData("version"));
 
 		return ret;
+	}
+
+	private String duration(String str) {
+		try {
+			String beforeFirstDot = str.split("\\.")[0];
+			int dur = Integer.parseInt(beforeFirstDot);
+			int secs = dur / 1000;
+			int hr = secs / 3600;
+			int rem = secs % 3600;
+			int mn = rem / 60;
+			int sec = rem % 60;
+			String hrStr = (hr < 10 ? "0" : "") + hr;
+			String mnStr = (mn < 10 ? "0" : "") + mn;
+			String secStr = (sec < 10 ? "0" : "") + sec;
+			if(hr > 0)
+				return hrStr + ":" + mnStr + ":" + secStr;
+			return mnStr + ":" + secStr;
+		} catch (NullPointerException ex) {
+			return "";
+		}
+	}
+
+	private String substring(String str, int start, int end) {
+		try {
+			if (str.length() > 10)
+				return str.substring(start, end);
+			else
+				return str;
+		} catch (NullPointerException ex) {
+			return "";
+		}
 	}
 
 	private String getMetaData(String string) {

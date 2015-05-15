@@ -117,8 +117,7 @@ public class JukeboxModelMapperTest {
 
 	@Test
 	public void mapValidate() {
-		//TODO 800 issue with concurrent providers and maps 
-		//modelMapper.validate();
+		// modelMapper.validate();
 	}
 
 	@Test
