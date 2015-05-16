@@ -264,11 +264,16 @@ public class JukeboxManager extends Observable {
 	public SongDTO getNextSong() {
 		if (currentJukebox != null) {
 			removeCurrentSongFromMandatoryPlaylist();
-			SongContainer sc = currentJukebox.getNextSong(currentSongInt);
+			SongContainer sc = null;
+			if (mandatory)
+				sc = currentJukebox.getNextSong(-1);
+			else
+				sc = currentJukebox.getNextSong(currentSongInt);
 			if (sc != null) {
 				SongDTO dto = modelMapper.map(sc.getSong(), SongDTO.class);
 				currentSongInt = sc.getPlaylistOrder();
 				mandatory = sc.getMandatory();
+				dto.setMandatory(String.valueOf(sc.getMandatory()));
 				dto.setPlayListOrder(String.valueOf(currentSongInt));
 				setCurrentSong(dto);
 				return dto;
@@ -296,7 +301,11 @@ public class JukeboxManager extends Observable {
 	public SongDTO getPreviousSong() {
 		if (currentJukebox != null) {
 			removeCurrentSongFromMandatoryPlaylist();
-			SongContainer sc = currentJukebox.getPreviousSong(currentSongInt);
+			SongContainer sc = null;
+			if (mandatory)
+				sc = currentJukebox.getPreviousSong(-1);
+			else
+				sc = currentJukebox.getPreviousSong(currentSongInt);
 			if (sc != null) {
 				SongDTO dto = modelMapper.map(sc.getSong(), SongDTO.class);
 				currentSongInt = sc.getPlaylistOrder();
@@ -524,6 +533,7 @@ public class JukeboxManager extends Observable {
 		currentSong = song;
 		mandatory = Boolean.parseBoolean(songDTO.getMandatory());
 		try {
+			
 			currentSongInt = Integer.parseInt(songDTO.getPlayListOrder());
 		} catch (NumberFormatException ex) {
 			currentSongInt = 0;
