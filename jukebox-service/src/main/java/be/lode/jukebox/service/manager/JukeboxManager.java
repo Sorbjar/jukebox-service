@@ -291,7 +291,7 @@ public class JukeboxManager extends Observable {
 											.getHostAddress()
 									+ ":8080/registercustomer?jukeboxid="
 									+ String.valueOf(currentJukebox.getId()),
-							450, 450).toURI().toURL());
+							350, 350).toURI().toURL(), currentJukebox.getName());
 			return pdf;
 		} catch (UnknownHostException | MalformedURLException e) {
 			return null;
