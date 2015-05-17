@@ -289,7 +289,7 @@ public class JukeboxManager extends Observable {
 							"http://"
 									+ InetAddress.getLocalHost()
 											.getHostAddress()
-									+ "/registercustomer?jukeboxid="
+									+ ":8080/registercustomer?jukeboxid="
 									+ String.valueOf(currentJukebox.getId()),
 							450, 450).toURI().toURL());
 			return pdf;
@@ -332,7 +332,7 @@ public class JukeboxManager extends Observable {
 	public StreamSource getQRStream(int width, int height) {
 		try {
 			return new QRStream("http://"
-					+ InetAddress.getLocalHost().getHostAddress()
+					+ InetAddress.getLocalHost().getHostAddress() + ":8080"
 					+ "/registercustomer?jukeboxid="
 					+ String.valueOf(currentJukebox.getId()), width, height);
 		} catch (UnknownHostException e) {
@@ -420,7 +420,7 @@ public class JukeboxManager extends Observable {
 		try {
 			InternetAddress emailAddr = new InternetAddress(email);
 			emailAddr.validate();
-		} catch (AddressException ex) {
+		} catch (NullPointerException | AddressException ex) {
 			result = false;
 		}
 		return result;
@@ -533,7 +533,7 @@ public class JukeboxManager extends Observable {
 		currentSong = song;
 		mandatory = Boolean.parseBoolean(songDTO.getMandatory());
 		try {
-			
+
 			currentSongInt = Integer.parseInt(songDTO.getPlayListOrder());
 		} catch (NumberFormatException ex) {
 			currentSongInt = 0;
