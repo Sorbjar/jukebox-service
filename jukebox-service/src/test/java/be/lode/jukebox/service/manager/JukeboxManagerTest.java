@@ -712,7 +712,7 @@ public class JukeboxManagerTest {
 
 		SongDTO dto1 = mapper.map(s1, SongDTO.class);
 		dto1.setPlayListOrder("0");
-		
+
 		SongDTO dto2 = mapper.map(s2, SongDTO.class);
 		dto2.setPlayListOrder("1");
 
@@ -730,5 +730,10 @@ public class JukeboxManagerTest {
 		dto4.setPlayListOrder("0");
 
 		assertEquals(dto4, mgr.getFirstSong());
+	}
+
+	@Test
+	public void testGetRoleList() {
+		assertTrue(mgr.getRoleList().contains("Manager"));
 	}
 }

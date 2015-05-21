@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -33,6 +34,7 @@ import be.lode.jukebox.service.dto.CurrencyDTO;
 import be.lode.jukebox.service.dto.JukeboxDTO;
 import be.lode.jukebox.service.dto.PayPalSettingsDTO;
 import be.lode.jukebox.service.dto.PlaylistDTO;
+import be.lode.jukebox.service.dto.SecurityAccountDTO;
 import be.lode.jukebox.service.dto.SongDTO;
 import be.lode.jukebox.service.mapper.JukeboxModelMapper;
 import be.lode.jukebox.service.output.PDFStream;
@@ -170,6 +172,20 @@ public class JukeboxManager extends Observable {
 		return null;
 	}
 
+	public List<SecurityAccountDTO> getAllSecurityAccounts() {
+		List<SecurityAccountDTO> ret = new ArrayList<SecurityAccountDTO>();
+		for (Account acc : accountRepo.getList()) {
+			if (currentJukebox.getAccountRoles().containsKey(acc)) {
+				SecurityAccountDTO toAdd = modelMapper.map(acc,
+						SecurityAccountDTO.class);
+				toAdd.setRole(currentJukebox.getAccountRoles().get(acc)
+						.toString());
+				ret.add(toAdd);
+			}
+		}
+		return ret;
+	}
+
 	public List<SongDTO> getAllSongs() {
 		List<SongDTO> ret = new ArrayList<SongDTO>();
 		for (Song s : songRepo.getList()) {
@@ -259,6 +275,26 @@ public class JukeboxManager extends Observable {
 					PlaylistDTO.class);
 		}
 		return null;
+	}
+
+	public List<SongDTO> getMandatorySongs() {
+		List<SongDTO> ret = new ArrayList<SongDTO>();
+		if (currentJukebox != null
+				&& currentJukebox.getMandatoryPlaylist() != null) {
+			Playlist pl = playlistRepo.find(currentJukebox
+					.getMandatoryPlaylist());
+			if (pl != null) {
+				for (Map.Entry<Integer, Song> entry : pl.getSongs().entrySet()) {
+					Song value = entry.getValue();
+					SongDTO dto = modelMapper.map(value, SongDTO.class);
+					dto.setPlayListOrder(entry.getKey().toString());
+					dto.setMandatory(String.valueOf(true));
+					ret.add(dto);
+				}
+			}
+		}
+
+		return ret;
 	}
 
 	public SongDTO getNextSong() {
@@ -368,26 +404,6 @@ public class JukeboxManager extends Observable {
 		return ret;
 	}
 
-	public List<SongDTO> getMandatorySongs() {
-		List<SongDTO> ret = new ArrayList<SongDTO>();
-		if (currentJukebox != null
-				&& currentJukebox.getMandatoryPlaylist() != null) {
-			Playlist pl = playlistRepo.find(currentJukebox
-					.getMandatoryPlaylist());
-			if (pl != null) {
-				for (Map.Entry<Integer, Song> entry : pl.getSongs().entrySet()) {
-					Song value = entry.getValue();
-					SongDTO dto = modelMapper.map(value, SongDTO.class);
-					dto.setPlayListOrder(entry.getKey().toString());
-					dto.setMandatory(String.valueOf(true));
-					ret.add(dto);
-				}
-			}
-		}
-
-		return ret;
-	}
-
 	public AccountDTO getUser(IOAuthUser user) {
 		AccountDTO o = new AccountDTO();
 		o.setEmailAddress(user.getEmail());
@@ -424,6 +440,14 @@ public class JukeboxManager extends Observable {
 			result = false;
 		}
 		return result;
+	}
+
+	public boolean mandatoryEmpty() {
+		try {
+			return currentJukebox.getMandatoryPlaylist().getSongs().size() <= 0;
+		} catch (NullPointerException ex) {
+			return true;
+		}
 	}
 
 	public void removeSongFromCurrentPlaylist(SongDTO song) {
@@ -588,11 +612,11 @@ public class JukeboxManager extends Observable {
 		return newFields;
 	}
 
-	public boolean mandatoryEmpty() {
-		try {
-			return currentJukebox.getMandatoryPlaylist().getSongs().size() <= 0;
-		} catch (NullPointerException ex) {
-			return true;
+	public List<String> getRoleList() {
+		List<String> roleList = new ArrayList<String>();
+		for (Role role : Arrays.asList(Role.values())) {
+			roleList.add(modelMapper.map(role, String.class));
 		}
+		return roleList;
 	}
 }
