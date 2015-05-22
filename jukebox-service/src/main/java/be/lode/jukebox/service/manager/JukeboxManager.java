@@ -306,13 +306,17 @@ public class JukeboxManager extends Observable {
 			else
 				sc = currentJukebox.getNextSong(currentSongInt);
 			if (sc != null) {
-				SongDTO dto = modelMapper.map(sc.getSong(), SongDTO.class);
-				currentSongInt = sc.getPlaylistOrder();
-				mandatory = sc.getMandatory();
-				dto.setMandatory(String.valueOf(sc.getMandatory()));
-				dto.setPlayListOrder(String.valueOf(currentSongInt));
-				setCurrentSong(dto);
-				return dto;
+				try {
+					SongDTO dto = modelMapper.map(sc.getSong(), SongDTO.class);
+					currentSongInt = sc.getPlaylistOrder();
+					mandatory = sc.getMandatory();
+					dto.setMandatory(String.valueOf(sc.getMandatory()));
+					dto.setPlayListOrder(String.valueOf(currentSongInt));
+					setCurrentSong(dto);
+					return dto;
+				} catch (IllegalArgumentException | NullPointerException ex) {
+					// do nothing
+				}
 			}
 		}
 		return null;
@@ -618,5 +622,65 @@ public class JukeboxManager extends Observable {
 			roleList.add(modelMapper.map(role, String.class));
 		}
 		return roleList;
+	}
+
+	// TODO 010 testing
+	public void deleteAccount(SecurityAccountDTO toDelete) {
+		try {
+			Account acc = modelMapper.map(toDelete, Account.class);
+			if (currentJukebox.getAccountRoles().containsKey(acc)) {
+				currentJukebox.getAccountRoles().remove(acc);
+			}
+			currentJukebox = jukeboxRepo.save(currentJukebox);
+		} catch (NullPointerException ex) {
+			// do nothing
+		}
+	}
+
+	// TODO 010 testing
+	public boolean canRemove(SecurityAccountDTO toDelete) {
+		try {
+			Account acc = modelMapper.map(toDelete, Account.class);
+			if (currentJukebox.getAccountRoles().containsKey(acc)) {
+				if (currentJukebox.getAccountRoles().get(acc) != Role.Administrator)
+					return true;
+				else {
+					int administratorCount = 0;
+					for (Map.Entry<Account, Role> entry : currentJukebox
+							.getAccountRoles().entrySet()) {
+						if (entry.getValue() == Role.Administrator) {
+							administratorCount++;
+						}
+					}
+					if (administratorCount > 1)
+						return true;
+				}
+			}
+			return false;
+		} catch (NullPointerException ex) {
+			return false;
+		}
+	}
+
+	// TODO 010 testing
+	public boolean isCurrentAccount(AccountDTO loggedInAccount,
+			SecurityAccountDTO toDelete) {
+		try {
+			return modelMapper.map(loggedInAccount, Account.class).equals(
+					modelMapper.map(toDelete, Account.class));
+		} catch (NullPointerException ex) {
+			return true;
+		}
+	}
+
+	// TODO 010 testing
+	public void updateAccount(SecurityAccountDTO secAcc, String role) {
+		try {
+			Account acc = modelMapper.map(secAcc, Account.class);
+			currentJukebox.addAccountRole(acc,
+					modelMapper.map(role, Role.class));
+		} catch (NullPointerException ex) {
+			// do nothing
+		}
 	}
 }
