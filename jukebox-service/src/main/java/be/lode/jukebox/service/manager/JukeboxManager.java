@@ -707,4 +707,37 @@ public class JukeboxManager extends Observable {
 		}
 
 	}
+
+	public void updateCurrentUser() {
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_ACCOUNT);
+
+	}
+
+	// TODO 010 testing
+	public Role getCurrentAccountRole(AccountDTO loggedInAccount) {
+		Account acc = modelMapper.map(loggedInAccount, Account.class);
+		for (Map.Entry<Account, Role> entry : currentJukebox.getAccountRoles()
+				.entrySet()) {
+			if (entry.getKey().equals(acc))
+				return entry.getValue();
+		}
+		return null;
+	}
+
+	// TODO 010 testing
+	public void removeAllCustomers() {
+		List<Account> accountList = new ArrayList<Account>();
+		for (Map.Entry<Account, Role> entry : currentJukebox.getAccountRoles()
+				.entrySet()) {
+			if (entry.getValue().equals(Role.Customer))
+				accountList.add(entry.getKey());
+		}
+		for (Account account : accountList) {
+			currentJukebox.getAccountRoles().remove(account);
+		}
+		currentJukebox = jukeboxRepo.save(currentJukebox);
+		setChanged();
+		notifyObservers(UpdateArgs.CURRENT_JUKEBOX);
+	}
 }
