@@ -7,6 +7,7 @@ public class AccountDTO {
 	private String lastName;
 	private String serviceId;
 	private String serviceName;
+	private String fullName;
 
 	public AccountDTO() {
 		super();
@@ -16,6 +17,15 @@ public class AccountDTO {
 		this.lastName = "";
 		this.serviceId = "";
 		this.serviceName = "";
+		this.fullName = "";
+	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 
 	@Override

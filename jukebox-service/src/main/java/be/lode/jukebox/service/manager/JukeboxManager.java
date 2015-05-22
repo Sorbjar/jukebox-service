@@ -683,4 +683,28 @@ public class JukeboxManager extends Observable {
 			// do nothing
 		}
 	}
+
+	// TODO 010 testing
+	public List<AccountDTO> getAllNonPermittedAccounts() {
+		List<AccountDTO> ret = new ArrayList<AccountDTO>();
+		for (Account acc : accountRepo.getList()) {
+			if (!currentJukebox.getAccountRoles().containsKey(acc)) {
+				AccountDTO toAdd = modelMapper.map(acc, AccountDTO.class);
+				ret.add(toAdd);
+			}
+		}
+		return ret;
+	}
+
+	// TODO 010 testing
+	public void addAccount(AccountDTO toAdd) {
+		try {
+			Account acc = modelMapper.map(toAdd, Account.class);
+			currentJukebox.addAccountRole(acc, Role.Customer);
+			currentJukebox = jukeboxRepo.save(currentJukebox);
+		} catch (IllegalArgumentException | NullPointerException ex) {
+			// do nothing
+		}
+
+	}
 }
