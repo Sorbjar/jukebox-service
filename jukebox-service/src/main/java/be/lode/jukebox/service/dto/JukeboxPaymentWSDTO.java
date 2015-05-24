@@ -7,16 +7,16 @@ public class JukeboxPaymentWSDTO {
 
 	/** The currency code. */
 	private String currencyCode;
-	
+
 	/** The email. */
 	private String email;
-	
+
 	/** The id. */
 	private String id;
-	
+
 	/** The name. */
 	private String name;
-	
+
 	/** The price per song. */
 	private String pricePerSong;
 
@@ -68,7 +68,8 @@ public class JukeboxPaymentWSDTO {
 	/**
 	 * Sets the currency code.
 	 *
-	 * @param currencyCode the new currency code
+	 * @param currencyCode
+	 *            the new currency code
 	 */
 	public void setCurrencyCode(String currencyCode) {
 		this.currencyCode = currencyCode;
@@ -77,7 +78,8 @@ public class JukeboxPaymentWSDTO {
 	/**
 	 * Sets the email.
 	 *
-	 * @param email the new email
+	 * @param email
+	 *            the new email
 	 */
 	public void setEmail(String email) {
 		this.email = email;
@@ -86,7 +88,8 @@ public class JukeboxPaymentWSDTO {
 	/**
 	 * Sets the id.
 	 *
-	 * @param id the new id
+	 * @param id
+	 *            the new id
 	 */
 	public void setId(String id) {
 		this.id = id;
@@ -95,7 +98,8 @@ public class JukeboxPaymentWSDTO {
 	/**
 	 * Sets the name.
 	 *
-	 * @param name the new name
+	 * @param name
+	 *            the new name
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -104,7 +108,8 @@ public class JukeboxPaymentWSDTO {
 	/**
 	 * Sets the price per song.
 	 *
-	 * @param pricePerSong the new price per song
+	 * @param pricePerSong
+	 *            the new price per song
 	 */
 	public void setPricePerSong(String pricePerSong) {
 		this.pricePerSong = pricePerSong;

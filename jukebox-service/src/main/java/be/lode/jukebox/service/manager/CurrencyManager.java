@@ -16,13 +16,13 @@ import be.lode.jukebox.service.mapper.JukeboxModelMapper;
  * The Class CurrencyManager.
  */
 public class CurrencyManager {
-	
+
 	/** The currency repo. */
 	private Repository<Currency> currencyRepo;
-	
+
 	/** The entity manager factory. */
 	private EntityManagerFactory emf;
-	
+
 	/** The model mapper. */
 	private JukeboxModelMapper modelMapper;
 
@@ -39,7 +39,8 @@ public class CurrencyManager {
 	/**
 	 * Instantiates a new currency manager.
 	 *
-	 * @param emf the emf
+	 * @param emf
+	 *            the emf
 	 */
 	public CurrencyManager(EntityManagerFactory emf) {
 		super();
@@ -51,11 +52,12 @@ public class CurrencyManager {
 	/**
 	 * Gets the currency.
 	 *
-	 * @param payPalCurrencyCode the pay pal currency code
+	 * @param payPalCurrencyCode
+	 *            the pay pal currency code
 	 * @return the currency
 	 */
 	public CurrencyDTO getCurrency(String payPalCurrencyCode) {
-		Currency cur = new Currency(payPalCurrencyCode,"");
+		Currency cur = new Currency(payPalCurrencyCode, "");
 		cur = currencyRepo.findEquals(cur);
 		return modelMapper.map(cur, CurrencyDTO.class);
 	}
@@ -72,7 +74,8 @@ public class CurrencyManager {
 	/**
 	 * Map.
 	 *
-	 * @param list the list
+	 * @param list
+	 *            the list
 	 * @return the list
 	 */
 	private List<CurrencyDTO> map(List<Currency> list) {
