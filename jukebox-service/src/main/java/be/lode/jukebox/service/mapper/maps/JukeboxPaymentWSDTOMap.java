@@ -5,9 +5,17 @@ import org.modelmapper.PropertyMap;
 import be.lode.jukebox.business.model.Jukebox;
 import be.lode.jukebox.service.dto.JukeboxPaymentWSDTO;
 
+/**
+ * The Class JukeboxPaymentWSDTOMap.
+ */
 public class JukeboxPaymentWSDTOMap extends
 		PropertyMap<Jukebox, JukeboxPaymentWSDTO> {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.modelmapper.PropertyMap#configure()
+	 */
 	@Override
 	protected void configure() {
 		map().setId(String.valueOf(source.getId()));

@@ -7,8 +7,16 @@ import org.modelmapper.spi.MappingContext;
 import be.lode.jukebox.business.model.Account;
 import be.lode.jukebox.service.dto.AccountDTO;
 
+/**
+ * The Class AccountMap.
+ */
 public class AccountMap extends PropertyMap<Account, AccountDTO> {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.modelmapper.PropertyMap#configure()
+	 */
 	@Override
 	protected void configure() {
 		map().setId(String.valueOf(source.getId()));

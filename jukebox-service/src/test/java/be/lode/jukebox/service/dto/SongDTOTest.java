@@ -12,6 +12,7 @@ import be.lode.setup.ResetDBSetupLiveData;
 import be.lode.setup.ResetDBSetupTestData;
 
 public class SongDTOTest {
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		ResetDBSetupTestData.run();
@@ -21,6 +22,7 @@ public class SongDTOTest {
 	public static void tearDownAfterClass() throws Exception {
 		ResetDBSetupLiveData.run();
 	}
+
 	@Test
 	public void testEquals() {
 		EqualsVerifier.forClass(SongDTO.class).usingGetClass()

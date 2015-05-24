@@ -13,11 +13,27 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.server.StreamResource.StreamSource;
 
+
+/**
+ * The Class PDFStream.
+ */
 public class PDFStream implements StreamSource {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -4765669039826902279L;
+	
+	/** The ByteArrayOutputStream. */
 	private ByteArrayOutputStream baos;
+	
+	/** The document. */
 	private Document document;
 
+	/**
+	 * Instantiates a new PDF stream.
+	 *
+	 * @param url the url
+	 * @param jukeboxName the jukebox name
+	 */
 	public PDFStream(URL url, String jukeboxName) {
 		baos = new ByteArrayOutputStream();
 		document = null;
@@ -43,6 +59,9 @@ public class PDFStream implements StreamSource {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.vaadin.server.StreamResource.StreamSource#getStream()
+	 */
 	@Override
 	public InputStream getStream() {
 		return new ByteArrayInputStream(baos.toByteArray());

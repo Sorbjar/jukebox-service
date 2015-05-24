@@ -7,14 +7,21 @@ import org.modelmapper.spi.MappingContext;
 import be.lode.jukebox.business.model.Account;
 import be.lode.jukebox.service.dto.SecurityAccountDTO;
 
+/**
+ * The Class SecurityAccountMap.
+ */
 public class SecurityAccountMap extends
 		PropertyMap<Account, SecurityAccountDTO> {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.modelmapper.PropertyMap#configure()
+	 */
 	@Override
 	protected void configure() {
 		map().setId(String.valueOf(source.getId()));
 
-		
 		Converter<String, String> c = new Converter<String, String>() {
 			@Override
 			public String convert(MappingContext<String, String> context) {

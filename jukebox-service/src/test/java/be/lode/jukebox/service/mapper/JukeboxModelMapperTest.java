@@ -21,6 +21,7 @@ import be.lode.setup.ResetDBSetupLiveData;
 import be.lode.setup.ResetDBSetupTestData;
 
 public class JukeboxModelMapperTest {
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		ResetDBSetupTestData.run();
@@ -116,8 +117,14 @@ public class JukeboxModelMapperTest {
 	}
 
 	@Test
-	public void mapValidate() {
-		// modelMapper.validate();
+	public void mapPlaylistDTOToObj() {
+		PlaylistDTO oDTO = new PlaylistDTO();
+		oDTO.setId("17");
+		oDTO.setName("mapPlaylistDTOToObj");
+
+		Playlist o = modelMapper.map(oDTO, Playlist.class);
+		assertEquals(oDTO.getId(), String.valueOf(o.getId()));
+		assertEquals(oDTO.getName(), o.getName());
 	}
 
 	@Test
@@ -131,14 +138,18 @@ public class JukeboxModelMapperTest {
 	}
 
 	@Test
-	public void mapPlaylistDTOToObj() {
-		PlaylistDTO oDTO = new PlaylistDTO();
+	public void mapSongDTOToObj() {
+		SongDTO oDTO = new SongDTO();
 		oDTO.setId("17");
-		oDTO.setName("mapPlaylistDTOToObj");
+		oDTO.setArtist("mapSongDTOToObjArtist");
+		oDTO.setTitle("mapSongDTOToObjTitle");
+		oDTO.setPath("mapSongDTOToObjPath");
 
-		Playlist o = modelMapper.map(oDTO, Playlist.class);
+		Song o = modelMapper.map(oDTO, Song.class);
 		assertEquals(oDTO.getId(), String.valueOf(o.getId()));
-		assertEquals(oDTO.getName(), o.getName());
+		assertEquals(oDTO.getArtist(), o.getArtist());
+		assertEquals(oDTO.getTitle(), o.getTitle());
+		assertEquals(oDTO.getPath(), o.getPath());
 	}
 
 	@Test
@@ -155,18 +166,8 @@ public class JukeboxModelMapperTest {
 	}
 
 	@Test
-	public void mapSongDTOToObj() {
-		SongDTO oDTO = new SongDTO();
-		oDTO.setId("17");
-		oDTO.setArtist("mapSongDTOToObjArtist");
-		oDTO.setTitle("mapSongDTOToObjTitle");
-		oDTO.setPath("mapSongDTOToObjPath");
-
-		Song o = modelMapper.map(oDTO, Song.class);
-		assertEquals(oDTO.getId(), String.valueOf(o.getId()));
-		assertEquals(oDTO.getArtist(), o.getArtist());
-		assertEquals(oDTO.getTitle(), o.getTitle());
-		assertEquals(oDTO.getPath(), o.getPath());
+	public void mapValidate() {
+		// modelMapper.validate();
 	}
 
 	@Before

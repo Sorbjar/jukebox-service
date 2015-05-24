@@ -12,6 +12,7 @@ import be.lode.setup.ResetDBSetupLiveData;
 import be.lode.setup.ResetDBSetupTestData;
 
 public class OAuthApiInfoManagerTest {
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		ResetDBSetupTestData.run();

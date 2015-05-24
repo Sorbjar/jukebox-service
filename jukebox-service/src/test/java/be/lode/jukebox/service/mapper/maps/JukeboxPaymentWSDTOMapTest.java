@@ -28,11 +28,6 @@ public class JukeboxPaymentWSDTOMapTest {
 
 	private JukeboxModelMapper modelMapper;
 
-	@Before
-	public void setUp() throws Exception {
-		modelMapper = new JukeboxModelMapper();
-	}
-
 	@Test
 	public void mapJukeboxToJukeboxPaymentWSDTO() {
 
@@ -47,5 +42,10 @@ public class JukeboxPaymentWSDTOMapTest {
 
 		assertEquals(String.valueOf(o.getId()), oDTO.getId());
 		assertEquals(o.getName(), oDTO.getName());
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		modelMapper = new JukeboxModelMapper();
 	}
 }

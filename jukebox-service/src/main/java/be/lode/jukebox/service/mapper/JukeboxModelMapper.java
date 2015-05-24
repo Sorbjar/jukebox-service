@@ -19,14 +19,23 @@ import be.lode.jukebox.service.mapper.providers.PayPalSettingsProvider;
 import be.lode.jukebox.service.mapper.providers.SongDTOProvider;
 import be.lode.jukebox.service.mapper.providers.SongProvider;
 
+/**
+ * The Class JukeboxModelMapper.
+ */
 public class JukeboxModelMapper extends ModelMapper {
 
+	/**
+	 * Instantiates a new jukebox model mapper.
+	 */
 	public JukeboxModelMapper() {
 		super();
 		createTypeMaps();
 		addMappings();
 	}
 
+	/**
+	 * Adds the mappings.
+	 */
 	private void addMappings() {
 		this.addMappings(new OAuthApiInfoMap());
 		this.addMappings(new OAuthUserMap());
@@ -36,6 +45,9 @@ public class JukeboxModelMapper extends ModelMapper {
 		this.addMappings(new SecurityAccountMap());
 	}
 
+	/**
+	 * Creates the type maps.
+	 */
 	private void createTypeMaps() {
 		this.createTypeMap(SongDTO.class, Song.class).setProvider(
 				new SongProvider());

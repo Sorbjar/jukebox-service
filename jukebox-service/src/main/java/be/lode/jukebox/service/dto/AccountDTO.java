@@ -1,14 +1,34 @@
 package be.lode.jukebox.service.dto;
 
+/**
+ * The Class AccountDTO.
+ */
 public class AccountDTO {
+
+	/** The email address. */
 	private String emailAddress;
+
+	/** The first name. */
 	private String firstName;
-	private String id;
-	private String lastName;
-	private String serviceId;
-	private String serviceName;
+
+	/** The full name. */
 	private String fullName;
 
+	/** The id. */
+	private String id;
+
+	/** The last name. */
+	private String lastName;
+
+	/** The service id. */
+	private String serviceId;
+
+	/** The service name. */
+	private String serviceName;
+
+	/**
+	 * Instantiates a new account dto.
+	 */
 	public AccountDTO() {
 		super();
 		this.emailAddress = "";
@@ -20,14 +40,11 @@ public class AccountDTO {
 		this.fullName = "";
 	}
 
-	public String getFullName() {
-		return fullName;
-	}
-
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -50,30 +67,74 @@ public class AccountDTO {
 		return true;
 	}
 
+	/**
+	 * Gets the email address.
+	 *
+	 * @return the email address
+	 */
 	public String getEmailAddress() {
 		return emailAddress;
 	}
 
+	/**
+	 * Gets the first name.
+	 *
+	 * @return the first name
+	 */
 	public String getFirstName() {
 		return firstName;
 	}
 
+	/**
+	 * Gets the full name.
+	 *
+	 * @return the full name
+	 */
+	public String getFullName() {
+		return fullName;
+	}
+
+	/**
+	 * Gets the id.
+	 *
+	 * @return the id
+	 */
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * Gets the last name.
+	 *
+	 * @return the last name
+	 */
 	public String getLastName() {
 		return lastName;
 	}
 
+	/**
+	 * Gets the service id.
+	 *
+	 * @return the service id
+	 */
 	public String getServiceId() {
 		return serviceId;
 	}
 
+	/**
+	 * Gets the service name.
+	 *
+	 * @return the service name
+	 */
 	public String getServiceName() {
 		return serviceName;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -85,30 +146,81 @@ public class AccountDTO {
 		return result;
 	}
 
+	/**
+	 * Sets the email address.
+	 *
+	 * @param emailAddress
+	 *            the new email address
+	 */
 	public void setEmailAddress(String emailAddress) {
 		this.emailAddress = emailAddress;
 	}
 
+	/**
+	 * Sets the first name.
+	 *
+	 * @param firstName
+	 *            the new first name
+	 */
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
 
+	/**
+	 * Sets the full name.
+	 *
+	 * @param fullName
+	 *            the new full name
+	 */
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+	/**
+	 * Sets the id.
+	 *
+	 * @param id
+	 *            the new id
+	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
+	/**
+	 * Sets the last name.
+	 *
+	 * @param lastName
+	 *            the new last name
+	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
 
+	/**
+	 * Sets the service id.
+	 *
+	 * @param serviceId
+	 *            the new service id
+	 */
 	public void setServiceId(String serviceId) {
 		this.serviceId = serviceId;
 	}
 
+	/**
+	 * Sets the service name.
+	 *
+	 * @param serviceName
+	 *            the new service name
+	 */
 	public void setServiceName(String serviceName) {
 		this.serviceName = serviceName;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return firstName + " " + lastName;

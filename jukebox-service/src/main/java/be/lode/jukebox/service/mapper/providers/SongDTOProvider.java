@@ -5,10 +5,20 @@ import org.modelmapper.Provider;
 import be.lode.jukebox.business.model.Song;
 import be.lode.jukebox.service.dto.SongDTO;
 
+/**
+ * The Class SongDTOProvider.
+ */
 public class SongDTOProvider implements Provider<SongDTO> {
 
+	/** The source. */
 	private Song source;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.modelmapper.Provider#get(org.modelmapper.Provider.ProvisionRequest)
+	 */
 	@Override
 	public SongDTO get(ProvisionRequest<SongDTO> request) {
 		source = Song.class.cast(request.getSource());
@@ -45,6 +55,13 @@ public class SongDTOProvider implements Provider<SongDTO> {
 		return ret;
 	}
 
+	/**
+	 * Duration.
+	 *
+	 * @param str
+	 *            the str
+	 * @return the string
+	 */
 	private String duration(String str) {
 		try {
 			String beforeFirstDot = str.split("\\.")[0];
@@ -57,7 +74,7 @@ public class SongDTOProvider implements Provider<SongDTO> {
 			String hrStr = (hr < 10 ? "0" : "") + hr;
 			String mnStr = (mn < 10 ? "0" : "") + mn;
 			String secStr = (sec < 10 ? "0" : "") + sec;
-			if(hr > 0)
+			if (hr > 0)
 				return hrStr + ":" + mnStr + ":" + secStr;
 			return mnStr + ":" + secStr;
 		} catch (NullPointerException ex) {
@@ -65,20 +82,38 @@ public class SongDTOProvider implements Provider<SongDTO> {
 		}
 	}
 
+	/**
+	 * Gets the meta data.
+	 *
+	 * @param string
+	 *            the string
+	 * @return the meta data
+	 */
+	private String getMetaData(String string) {
+		try {
+			return source.getMetadataProperties().get(string);
+		} catch (NullPointerException ex) {
+			return "";
+		}
+	}
+
+	/**
+	 * Substring.
+	 *
+	 * @param str
+	 *            the str
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 * @return the string
+	 */
 	private String substring(String str, int start, int end) {
 		try {
 			if (str.length() > 10)
 				return str.substring(start, end);
 			else
 				return str;
-		} catch (NullPointerException ex) {
-			return "";
-		}
-	}
-
-	private String getMetaData(String string) {
-		try {
-			return source.getMetadataProperties().get(string);
 		} catch (NullPointerException ex) {
 			return "";
 		}

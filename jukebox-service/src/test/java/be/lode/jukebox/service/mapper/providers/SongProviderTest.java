@@ -27,11 +27,6 @@ public class SongProviderTest {
 
 	private JukeboxModelMapper modelMapper;
 
-	@Before
-	public void setUp() throws Exception {
-		modelMapper = new JukeboxModelMapper();
-	}
-
 	@Test
 	public void mapSongToDTO() {
 		Song o = new Song("artistmapSongToDTO", "titlemapSongToDTO",
@@ -46,6 +41,11 @@ public class SongProviderTest {
 		assertEquals(o.getPath(), oDTO.getPath());
 		assertEquals(o.getMetadataProperties().get("creator"),
 				oDTO.getCreator());
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		modelMapper = new JukeboxModelMapper();
 	}
 
 }

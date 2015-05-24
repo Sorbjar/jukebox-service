@@ -27,9 +27,16 @@ public class CurrencyProviderTest {
 
 	private JukeboxModelMapper modelMapper;
 
-	@Before
-	public void setUp() throws Exception {
-		modelMapper = new JukeboxModelMapper();
+	@Test
+	public void mapAccountDTOToObj() {
+		CurrencyDTO oDTO = new CurrencyDTO();
+		oDTO.setName("currencyName");
+		oDTO.setPayPalCode("payPalCurrencyCode");
+
+		Currency o = modelMapper.map(oDTO, Currency.class);
+
+		assertEquals(oDTO.getName(), o.getName());
+		assertEquals(oDTO.getPayPalCode(), o.getPayPalCode());
 	}
 
 	@Test
@@ -43,15 +50,8 @@ public class CurrencyProviderTest {
 		assertEquals(oDTO.getPayPalCode(), o.getPayPalCode());
 	}
 
-	@Test
-	public void mapAccountDTOToObj() {
-		CurrencyDTO oDTO = new CurrencyDTO();
-		oDTO.setName("currencyName");
-		oDTO.setPayPalCode("payPalCurrencyCode");
-
-		Currency o = modelMapper.map(oDTO, Currency.class);
-
-		assertEquals(oDTO.getName(), o.getName());
-		assertEquals(oDTO.getPayPalCode(), o.getPayPalCode());
+	@Before
+	public void setUp() throws Exception {
+		modelMapper = new JukeboxModelMapper();
 	}
 }

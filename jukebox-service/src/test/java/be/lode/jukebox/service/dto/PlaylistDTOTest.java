@@ -11,24 +11,45 @@ import org.junit.Test;
 import be.lode.setup.ResetDBSetupLiveData;
 import be.lode.setup.ResetDBSetupTestData;
 
+/**
+ * The Class PlaylistDTOTest.
+ */
 public class PlaylistDTOTest {
 
+	/**
+	 * Sets the up before class.
+	 *
+	 * @throws Exception
+	 *             the exception
+	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		ResetDBSetupTestData.run();
 	}
 
+	/**
+	 * Tear down after class.
+	 *
+	 * @throws Exception
+	 *             the exception
+	 */
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		ResetDBSetupLiveData.run();
 	}
 
+	/**
+	 * Test equals.
+	 */
 	@Test
 	public void testEquals() {
 		EqualsVerifier.forClass(PlaylistDTO.class).usingGetClass()
 				.suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 
+	/**
+	 * Test to string.
+	 */
 	@Test
 	public void testToString() {
 		PlaylistDTO o = new PlaylistDTO();

@@ -38,6 +38,9 @@ import be.lode.setup.ResetDBSetupLiveData;
 import be.lode.setup.ResetDBSetupTestData;
 
 public class JukeboxManagerTest {
+
+	private static final double DELTA = 1e-15;
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		ResetDBSetupTestData.run();
@@ -49,8 +52,8 @@ public class JukeboxManagerTest {
 	}
 
 	private JukeboxModelMapper mapper;
+
 	private JukeboxManager mgr;
-	private static final double DELTA = 1e-15;
 
 	@Before
 	public void setUp() throws Exception {
@@ -203,6 +206,34 @@ public class JukeboxManagerTest {
 	}
 
 	@Test
+	public void testEditJukebox() {
+		Repository<PayPalSettings> pRepo = new PayPalSettingsRepository(
+				mgr.getEmf());
+		PayPalSettings pps = new PayPalSettings();
+		pps.setCurrency(new Currency("PLN", "Polish Zloty"));
+		pps.setEmail("newEm@email.com");
+		pps.setPricePerSong(1.24);
+		pps = pRepo.save(pps);
+
+		Account acc = new Account("emad@test.be", "fn", "ln", "1586",
+				"facebook");
+		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
+		acc = aRepo.save(acc);
+		Jukebox o = new Jukebox("testEditJukebox", acc);
+		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
+		o = jRepo.save(o);
+		o.setPayPalSettings(pps);
+
+		o = jRepo.save(o);
+		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
+		assertEquals("testEditJukebox", o.getName());
+		mgr.editJukebox("newName", "lol@lol.lol", mapper.map(new Currency(
+				"BFR", "Belgian Frank"), CurrencyDTO.class), "1.3");
+
+		assertEquals("newName", mgr.getCurrentJukeboxDTO().getName());
+	}
+
+	@Test
 	public void testGetAccount() {
 		AccountDTO oDTO = new AccountDTO();
 		oDTO.setEmailAddress("emailAddress");
@@ -245,6 +276,106 @@ public class JukeboxManagerTest {
 			assertNotNull(songDTO);
 			assertNotNull(songDTO.getId());
 		}
+	}
+
+	@Test
+	public void testGetCurrentPayPalSettingsDTO() {
+
+		Repository<PayPalSettings> pRepo = new PayPalSettingsRepository(
+				mgr.getEmf());
+		PayPalSettings pps = new PayPalSettings();
+		pps.setCurrency(new Currency("PLN", "Polish Zloty"));
+		pps.setEmail("newEm@email.com");
+		pps.setPricePerSong(1.24);
+		pps = pRepo.save(pps);
+
+		Account acc = new Account("emad@test.be", "fn", "ln", "1586",
+				"facebook");
+		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
+		acc = aRepo.save(acc);
+		Jukebox o = new Jukebox("testGetCurrentPayPalSettingsDTO", acc);
+		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
+		o = jRepo.save(o);
+		o.setPayPalSettings(pps);
+
+		o = jRepo.save(o);
+
+		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
+		assertEquals(mapper.map(pps, PayPalSettingsDTO.class),
+				mgr.getCurrentPayPalSettingsDTO());
+	}
+
+	@Test
+	public void testGetFirstSong() {
+		Account acc = new Account("testGetFirstSonga", "testGetFirstSongb",
+				"testGetFirstSongc", "testGetFirstSongd", "testGetFirstSonge");
+
+		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
+		acc = aRepo.save(acc);
+		Jukebox o = new Jukebox("testGetFirstSong", acc);
+
+		String artist = "s1" + "artist";
+		String title = "s1" + "title";
+		String path = "s1" + "path";
+
+		Song s1 = new Song(artist, title, path);
+
+		artist = "s2" + "artist";
+		title = "s2" + "title";
+		path = "s2" + "path";
+
+		Song s2 = new Song(artist, title, path);
+
+		artist = "s3" + "artist";
+		title = "s3" + "title";
+		path = "s3" + "path";
+
+		Song s3 = new Song(artist, title, path);
+
+		Repository<Song> sRepo = new SongRepository(mgr.getEmf());
+		s1 = sRepo.save(s1);
+		s2 = sRepo.save(s2);
+		s3 = sRepo.save(s3);
+
+		o.getCurrentPlaylist().addSong(s1);
+		o.getCurrentPlaylist().addSong(s2);
+		o.getCurrentPlaylist().addSong(s3);
+
+		artist = "s4" + "artist";
+		title = "s4" + "title";
+		path = "s4" + "path";
+
+		Song s4 = new Song(artist, title, path);
+
+		s4 = sRepo.save(s4);
+		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
+
+		o = jRepo.save(o);
+		JukeboxModelMapper mapper = new JukeboxModelMapper();
+		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
+
+		mgr.setCurrentSong(mapper.map(s1, SongDTO.class));
+
+		SongDTO dto1 = mapper.map(s1, SongDTO.class);
+		dto1.setPlayListOrder("0");
+
+		SongDTO dto2 = mapper.map(s2, SongDTO.class);
+		dto2.setPlayListOrder("1");
+
+		SongDTO test = mgr.getFirstSong();
+		assertEquals(dto1.getArtist(), test.getArtist());
+		assertEquals(dto1.getTitle(), test.getTitle());
+
+		o.getMandatoryPlaylist().addSong(s4);
+
+		o = jRepo.save(o);
+		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
+		mgr.setCurrentSong(mapper.map(s1, SongDTO.class));
+
+		SongDTO dto4 = mapper.map(s4, SongDTO.class);
+		dto4.setPlayListOrder("0");
+
+		assertEquals(dto4, mgr.getFirstSong());
 	}
 
 	@Test
@@ -402,6 +533,11 @@ public class JukeboxManagerTest {
 	}
 
 	@Test
+	public void testGetRoleList() {
+		assertTrue(mgr.getRoleList().contains("Manager"));
+	}
+
+	@Test
 	public void testGetSavedPlaylists() {
 		Jukebox jb = new Jukebox();
 		for (int i = 0; i < 5; i++) {
@@ -526,6 +662,13 @@ public class JukeboxManagerTest {
 	}
 
 	@Test
+	public void testRound() {
+		assertEquals("round up", 1.18, mgr.round(1.176, 2), DELTA);
+		assertEquals("round down", 1.17, mgr.round(1.173, 2), DELTA);
+
+	}
+
+	@Test
 	public void testSaveAccountDTO() {
 		AccountDTO oDTO = new AccountDTO();
 		oDTO.setEmailAddress("newaddress");
@@ -595,145 +738,5 @@ public class JukeboxManagerTest {
 				assertEquals(sDTO, mgr.getCurrentSongDTO());
 			}
 		}
-	}
-
-	@Test
-	public void testGetCurrentPayPalSettingsDTO() {
-
-		Repository<PayPalSettings> pRepo = new PayPalSettingsRepository(
-				mgr.getEmf());
-		PayPalSettings pps = new PayPalSettings();
-		pps.setCurrency(new Currency("PLN", "Polish Zloty"));
-		pps.setEmail("newEm@email.com");
-		pps.setPricePerSong(1.24);
-		pps = pRepo.save(pps);
-
-		Account acc = new Account("emad@test.be", "fn", "ln", "1586",
-				"facebook");
-		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
-		acc = aRepo.save(acc);
-		Jukebox o = new Jukebox("testGetCurrentPayPalSettingsDTO", acc);
-		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
-		o = jRepo.save(o);
-		o.setPayPalSettings(pps);
-
-		o = jRepo.save(o);
-
-		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
-		assertEquals(mapper.map(pps, PayPalSettingsDTO.class),
-				mgr.getCurrentPayPalSettingsDTO());
-	}
-
-	@Test
-	public void testEditJukebox() {
-		Repository<PayPalSettings> pRepo = new PayPalSettingsRepository(
-				mgr.getEmf());
-		PayPalSettings pps = new PayPalSettings();
-		pps.setCurrency(new Currency("PLN", "Polish Zloty"));
-		pps.setEmail("newEm@email.com");
-		pps.setPricePerSong(1.24);
-		pps = pRepo.save(pps);
-
-		Account acc = new Account("emad@test.be", "fn", "ln", "1586",
-				"facebook");
-		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
-		acc = aRepo.save(acc);
-		Jukebox o = new Jukebox("testEditJukebox", acc);
-		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
-		o = jRepo.save(o);
-		o.setPayPalSettings(pps);
-
-		o = jRepo.save(o);
-		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
-		assertEquals("testEditJukebox", o.getName());
-		mgr.editJukebox("newName", "lol@lol.lol", mapper.map(new Currency(
-				"BFR", "Belgian Frank"), CurrencyDTO.class), "1.3");
-
-		assertEquals("newName", mgr.getCurrentJukeboxDTO().getName());
-	}
-
-	@Test
-	public void testRound() {
-		assertEquals("round up", 1.18, mgr.round(1.176, 2), DELTA);
-		assertEquals("round down", 1.17, mgr.round(1.173, 2), DELTA);
-
-	}
-
-	@Test
-	public void testGetFirstSong() {
-		Account acc = new Account("testGetFirstSonga", "testGetFirstSongb",
-				"testGetFirstSongc", "testGetFirstSongd", "testGetFirstSonge");
-
-		Repository<Account> aRepo = new AccountRepository(mgr.getEmf());
-		acc = aRepo.save(acc);
-		Jukebox o = new Jukebox("testGetFirstSong", acc);
-
-		String artist = "s1" + "artist";
-		String title = "s1" + "title";
-		String path = "s1" + "path";
-
-		Song s1 = new Song(artist, title, path);
-
-		artist = "s2" + "artist";
-		title = "s2" + "title";
-		path = "s2" + "path";
-
-		Song s2 = new Song(artist, title, path);
-
-		artist = "s3" + "artist";
-		title = "s3" + "title";
-		path = "s3" + "path";
-
-		Song s3 = new Song(artist, title, path);
-
-		Repository<Song> sRepo = new SongRepository(mgr.getEmf());
-		s1 = sRepo.save(s1);
-		s2 = sRepo.save(s2);
-		s3 = sRepo.save(s3);
-
-		o.getCurrentPlaylist().addSong(s1);
-		o.getCurrentPlaylist().addSong(s2);
-		o.getCurrentPlaylist().addSong(s3);
-
-		artist = "s4" + "artist";
-		title = "s4" + "title";
-		path = "s4" + "path";
-
-		Song s4 = new Song(artist, title, path);
-
-		s4 = sRepo.save(s4);
-		Repository<Jukebox> jRepo = new JukeboxRepository(mgr.getEmf());
-
-		o = jRepo.save(o);
-		JukeboxModelMapper mapper = new JukeboxModelMapper();
-		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
-
-		mgr.setCurrentSong(mapper.map(s1, SongDTO.class));
-
-		SongDTO dto1 = mapper.map(s1, SongDTO.class);
-		dto1.setPlayListOrder("0");
-
-		SongDTO dto2 = mapper.map(s2, SongDTO.class);
-		dto2.setPlayListOrder("1");
-
-		SongDTO test = mgr.getFirstSong();
-		assertEquals(dto1.getArtist(), test.getArtist());
-		assertEquals(dto1.getTitle(), test.getTitle());
-
-		o.getMandatoryPlaylist().addSong(s4);
-
-		o = jRepo.save(o);
-		mgr.setCurrentJukebox(mapper.map(o, JukeboxDTO.class));
-		mgr.setCurrentSong(mapper.map(s1, SongDTO.class));
-
-		SongDTO dto4 = mapper.map(s4, SongDTO.class);
-		dto4.setPlayListOrder("0");
-
-		assertEquals(dto4, mgr.getFirstSong());
-	}
-
-	@Test
-	public void testGetRoleList() {
-		assertTrue(mgr.getRoleList().contains("Manager"));
 	}
 }

@@ -14,6 +14,7 @@ import be.lode.jukebox.service.dto.CurrencyDTO;
 import be.lode.setup.ResetDBSetupLiveData;
 import be.lode.setup.ResetDBSetupTestData;
 
+
 public class CurrencyManagerTest {
 
 	@BeforeClass
@@ -25,7 +26,6 @@ public class CurrencyManagerTest {
 	public static void tearDownAfterClass() throws Exception {
 		ResetDBSetupLiveData.run();
 	}
-
 	private CurrencyManager mgr;
 
 	@Before
@@ -33,20 +33,18 @@ public class CurrencyManagerTest {
 		ResetDBSetupTestData.run();
 		mgr = new CurrencyManager();
 	}
-
-	@Test
-	public void testGetCurrencyList() {
-		List<CurrencyDTO> curList = mgr.getCurrencyList();
-		assertNotNull("list not null", curList);
-		assertTrue("list - list not empty", curList.size() > 0);
-	}
-
 	@Test
 	public void testGetCurrency() {
 		for (CurrencyDTO cur : mgr.getCurrencyList()) {
 			CurrencyDTO sample = mgr.getCurrency(cur.getPayPalCode());
 			sample.getName().equals(cur.getName());
 		}
+	}
+	@Test
+	public void testGetCurrencyList() {
+		List<CurrencyDTO> curList = mgr.getCurrencyList();
+		assertNotNull("list not null", curList);
+		assertTrue("list - list not empty", curList.size() > 0);
 	}
 
 }

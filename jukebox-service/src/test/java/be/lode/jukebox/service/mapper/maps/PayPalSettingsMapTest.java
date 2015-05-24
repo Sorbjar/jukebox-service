@@ -28,9 +28,24 @@ public class PayPalSettingsMapTest {
 
 	private JukeboxModelMapper modelMapper;
 
-	@Before
-	public void setUp() throws Exception {
-		modelMapper = new JukeboxModelMapper();
+	@Test
+	public void mapAccountDTOToObj() {
+		PayPalSettingsDTO oDTO = new PayPalSettingsDTO();
+		oDTO.setCurrencyName("currencyName");
+		oDTO.setEmail("email");
+		oDTO.setPayPalCurrencyCode("payPalCurrencyCode");
+		oDTO.setPricePerSong("1.2");
+		oDTO.setId("10");
+
+		PayPalSettings o = modelMapper.map(oDTO, PayPalSettings.class);
+
+		assertEquals(Long.valueOf(oDTO.getId()).longValue(), o.getId());
+		assertEquals(oDTO.getCurrencyName(), o.getCurrency().getName());
+		assertEquals(oDTO.getEmail(), o.getEmail());
+		assertEquals(oDTO.getPayPalCurrencyCode(), o.getCurrency()
+				.getPayPalCode());
+		assertEquals(oDTO.getPricePerSong(),
+				String.valueOf(o.getPricePerSong()));
 	}
 
 	@Test
@@ -52,24 +67,9 @@ public class PayPalSettingsMapTest {
 				String.valueOf(o.getPricePerSong()));
 	}
 
-	@Test
-	public void mapAccountDTOToObj() {
-		PayPalSettingsDTO oDTO = new PayPalSettingsDTO();
-		oDTO.setCurrencyName("currencyName");
-		oDTO.setEmail("email");
-		oDTO.setPayPalCurrencyCode("payPalCurrencyCode");
-		oDTO.setPricePerSong("1.2");
-		oDTO.setId("10");
-
-		PayPalSettings o = modelMapper.map(oDTO, PayPalSettings.class);
-
-		assertEquals(Long.valueOf(oDTO.getId()).longValue(), o.getId());
-		assertEquals(oDTO.getCurrencyName(), o.getCurrency().getName());
-		assertEquals(oDTO.getEmail(), o.getEmail());
-		assertEquals(oDTO.getPayPalCurrencyCode(), o.getCurrency()
-				.getPayPalCode());
-		assertEquals(oDTO.getPricePerSong(),
-				String.valueOf(o.getPricePerSong()));
+	@Before
+	public void setUp() throws Exception {
+		modelMapper = new JukeboxModelMapper();
 	}
 
 }

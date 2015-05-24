@@ -6,8 +6,17 @@ import be.lode.jukebox.business.model.Currency;
 import be.lode.jukebox.business.model.PayPalSettings;
 import be.lode.jukebox.service.dto.PayPalSettingsDTO;
 
+/**
+ * The Class PayPalSettingsProvider.
+ */
 public class PayPalSettingsProvider implements Provider<PayPalSettings> {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.modelmapper.Provider#get(org.modelmapper.Provider.ProvisionRequest)
+	 */
 	@Override
 	public PayPalSettings get(ProvisionRequest<PayPalSettings> request) {
 		PayPalSettingsDTO dto = PayPalSettingsDTO.class.cast(request
